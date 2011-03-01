@@ -22,9 +22,12 @@ public class RDFCapabilityDescriptor
 
     private final FormField repoOrGroup;
 
+    private final FormField remoteRepositories;
+
     public RDFCapabilityDescriptor()
     {
         repoOrGroup = new RepoOrGroupComboFormField( REPO_OR_GROUP_ID, FormField.MANDATORY );
+        remoteRepositories = new RemoteRepositoriesFormField();
     }
 
     public String id()
@@ -39,7 +42,7 @@ public class RDFCapabilityDescriptor
 
     public List<FormField> formFields()
     {
-        return Arrays.asList( repoOrGroup );
+        return Arrays.asList( repoOrGroup, remoteRepositories );
     }
 
     public boolean isExposed()

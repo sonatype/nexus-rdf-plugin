@@ -18,12 +18,13 @@ import javax.inject.Singleton;
 
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Repository;
 import org.openrdf.model.Statement;
 import org.slf4j.Logger;
 import org.sonatype.nexus.plugin.rdf.ItemPath;
 import org.sonatype.nexus.plugin.rdf.StatementsProducer;
+import org.sonatype.sisu.maven.bridge.MavenBridge;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
-import org.sonatype.sisu.rdf.maven.POMBuilder;
 
 @Named( value = "pom" )
 @Singleton
@@ -33,36 +34,37 @@ public class POMStatementsProducer
 
     private final MavenToRDF mavenToRDF;
 
-    private final POMBuilder pomBuilder;
+    private final MavenBridge mavenBridge;
 
     @Inject
     private Logger logger;
 
     @Inject
-    public POMStatementsProducer( MavenToRDF mavenToRDF, POMBuilder pomBuilder )
+    public POMStatementsProducer( MavenToRDF mavenToRDF, MavenBridge mavenBridge )
     {
         this.mavenToRDF = mavenToRDF;
-        this.pomBuilder = pomBuilder;
+        this.mavenBridge = mavenBridge;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Collection<Statement> parse( final ItemPath path )
+    public Collection<Statement> parse( final ItemPath path, Repository... remoteRepositories )
     {
         assert path != null : "Parsed path must be specified (cannot be null)";
 
         final Gav gav = path.gav();
-        assert gav != null : "Parsed path GAV must be specified (cannot be null)";
 
-        if ( !maybeIsAPom( gav ) )
+        if ( path.gav() == null || !isAPom( gav ) )
         {
             return Collections.emptyList();
         }
+        
+        logger.debug( String.format( "Producing POM RDF statements for item [%s]", path ) );
 
         try
         {
-            Model model = pomBuilder.build( path.file() );
+            Model model = mavenBridge.buildModel( path.file(), remoteRepositories );
             Collection<Statement> statements = mavenToRDF.model( model );
             return statements;
         }
@@ -82,7 +84,7 @@ public class POMStatementsProducer
      * @param gav gav to check
      * @return true if gav refers to a pom or a main artifact, false otherwise
      */
-    private boolean maybeIsAPom( final Gav gav )
+    private boolean isAPom( final Gav gav )
     {
         // TODO shall we extract POM from main artifact?
         return "pom".equals( gav.getExtension() )

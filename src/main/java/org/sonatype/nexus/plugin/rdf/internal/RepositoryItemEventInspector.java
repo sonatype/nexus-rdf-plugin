@@ -7,18 +7,24 @@
  */
 package org.sonatype.nexus.plugin.rdf.internal;
 
+import java.io.File;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugin.rdf.ItemPath;
 import org.sonatype.nexus.plugin.rdf.RDFStore;
+import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -115,7 +121,8 @@ public class RepositoryItemEventInspector
     private void onItemAdded( final MavenRepository repository,
                               final RepositoryItemEvent event )
     {
-        rdfStore.index( new ItemPath( repository, event.getItem().getPath() ) );
+        rdfStore.index( new ItemPath( repository, getRepositoryLocalStorageAsFile( repository ),
+            event.getItem().getPath() ) );
     }
 
     /**
@@ -127,7 +134,32 @@ public class RepositoryItemEventInspector
     private void onItemRemoved( final MavenRepository repository,
                                 final RepositoryItemEvent event )
     {
-        rdfStore.remove( new ItemPath( repository, event.getItem().getPath() ) );
+        rdfStore.remove( new ItemPath( repository, getRepositoryLocalStorageAsFile( repository ),
+            event.getItem().getPath() ) );
+    }
+
+    protected File getRepositoryLocalStorageAsFile( Repository repository )
+    {
+        if ( repository.getLocalUrl() != null
+            && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
+        {
+            try
+            {
+                File baseDir =
+                    ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getBaseDir( repository,
+                        new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
+
+                return baseDir;
+            }
+            catch ( LocalStorageException e )
+            {
+                getLogger().warn(
+                    String.format( "Cannot determine \"%s\" (ID=%s) repository's basedir:", repository.getName(),
+                        repository.getId() ), e );
+            }
+        }
+
+        return null;
     }
 
 }

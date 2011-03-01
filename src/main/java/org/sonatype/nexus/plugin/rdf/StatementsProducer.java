@@ -9,25 +9,12 @@ package org.sonatype.nexus.plugin.rdf;
 
 import java.util.Collection;
 
+import org.apache.maven.model.Repository;
 import org.openrdf.model.Statement;
-import org.sonatype.plugin.ExtensionPoint;
 
-/**
- * An statements producer is able to parse a maven repository item into a collection of index statements.
- *
- * @author Alin Dreghiciu
- */
-@ExtensionPoint
 public interface StatementsProducer
 {
 
-    /**
-     * Parses an repository item specified by its GAV and produces index statements.
-     *
-     * @param path path of item to be parsed
-     *
-     * @return index statements. It can be null or empty, if the producer does not handle the gav.
-     */
-    Collection<Statement> parse( ItemPath path );
+    Collection<Statement> parse( ItemPath path, Repository... remoteRepositories );
 
 }

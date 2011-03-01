@@ -15,11 +15,11 @@ public class RDFCapabilityFactory
 {
 
     @Inject
-    private RDFStore mavenAttachedP2UpdateSiteManager;
+    private RDFStore rdfStore;
 
     public Capability create( final String id )
     {
-        return new RDFCapability( id, mavenAttachedP2UpdateSiteManager );
+        return new RDFCapability( id, rdfStore );
     }
 
 }

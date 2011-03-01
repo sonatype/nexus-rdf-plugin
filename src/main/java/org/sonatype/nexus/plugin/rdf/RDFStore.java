@@ -59,15 +59,15 @@ public class RDFStore
         Collection<Statement> statements = new ArrayList<Statement>();
         for ( StatementsProducer producer : statementsProducers )
         {
-            statements.addAll( producer.parse( path ) );
+            statements.addAll( producer.parse( path, matchingConfig.remoteRepositories() ) );
         }
         if ( !statements.isEmpty() )
         {
-            Repository repository = repositoryHub.repository( repositoryIdentity( matchingConfig.getRepositoryId() ) );
+            Repository repository = repositoryHub.repository( repositoryIdentity( matchingConfig.repositoryId() ) );
             try
             {
                 RepositoryConnection conn = repository.getConnection();
-                conn.add( statements, mavenToRDF.contextFor( matchingConfig.getRepositoryId(), path.path() ) );
+                conn.add( statements, mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
                 conn.commit();
                 conn.close();
             }
@@ -86,11 +86,11 @@ public class RDFStore
             return;
         }
         logger.debug( String.format( "About to remove RDF statements for item [%s]", path ) );
-        Repository repository = repositoryHub.repository( repositoryIdentity( matchingConfig.getRepositoryId() ) );
+        Repository repository = repositoryHub.repository( repositoryIdentity( matchingConfig.repositoryId() ) );
         try
         {
             RepositoryConnection conn = repository.getConnection();
-            conn.clear( mavenToRDF.contextFor( matchingConfig.getRepositoryId(), path.path() ) );
+            conn.clear( mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
             conn.commit();
             conn.close();
         }
@@ -102,14 +102,14 @@ public class RDFStore
 
     public void addConfiguration( final RDFConfiguration configuration )
     {
-        repositoryHub.repository( repositoryIdentity( configuration.getRepositoryId() ) );
-        configurations.put( configuration.getRepositoryId(), configuration );
+        repositoryHub.repository( repositoryIdentity( configuration.repositoryId() ) );
+        configurations.put( configuration.repositoryId(), configuration );
     }
 
     public void removeConfiguration( final RDFConfiguration configuration )
     {
-        configurations.remove( configuration.getRepositoryId() );
-        repositoryHub.shutdown( repositoryIdentity( configuration.getRepositoryId() ) );
+        configurations.remove( configuration.repositoryId() );
+        repositoryHub.shutdown( repositoryIdentity( configuration.repositoryId() ) );
     }
 
 }

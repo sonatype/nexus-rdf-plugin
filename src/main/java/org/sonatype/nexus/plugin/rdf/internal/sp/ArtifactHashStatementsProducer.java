@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.model.Repository;
 import org.openrdf.model.Statement;
 import org.slf4j.Logger;
 import org.sonatype.nexus.plugin.rdf.ItemPath;
@@ -47,18 +48,19 @@ public class ArtifactHashStatementsProducer
     /**
      * {@inheritDoc}
      */
-    public Collection<Statement> parse( final ItemPath path )
+    public Collection<Statement> parse( final ItemPath path, Repository... remoteRepositories )
     {
         assert path != null : "Parsed path must be specified (cannot be null)";
 
         final Gav gav = path.gav();
-        assert gav != null : "Parsed path GAV must be specified (cannot be null)";
 
-        if ( !path.gav().isHash() )
+        if ( path.gav() == null || path.isPathOfCustomMetadata() || !path.gav().isHash() )
         {
             return Collections.emptyList();
         }
-        
+
+        logger.debug( String.format( "Producing artifact hash RDF statements for item [%s]", path ) );
+
         try
         {
             Collection<Statement> statements =
@@ -75,12 +77,11 @@ public class ArtifactHashStatementsProducer
             return Collections.emptyList();
         }
     }
-    
+
     /**
      * Reads the content of a checksum file (md5/sha1)
-     *
+     * 
      * @param path checksum item file path
-     *
      * @return read checksum or null if the value cannot be read
      */
     private String readChecksum( final ItemPath path )
@@ -90,7 +91,7 @@ public class ArtifactHashStatementsProducer
         {
             is = new BufferedInputStream( new FileInputStream( path.file() ) );
             final String checksumFileContent = IOUtils.toString( is );
-            final String checksum = chomp( checksumFileContent ).trim().split( " " )[ 0 ];
+            final String checksum = chomp( checksumFileContent ).trim().split( " " )[0];
 
             return checksum;
         }
@@ -105,12 +106,12 @@ public class ArtifactHashStatementsProducer
     }
 
     /**
-     * <p>Remove the last newline, and everything after it from a String.</p>
-     *
+     * <p>
+     * Remove the last newline, and everything after it from a String.
+     * </p>
+     * 
      * @param str String to chomp the newline from
-     *
      * @return String without chomped newline
-     *
      * @throws NullPointerException if str is <code>null</code>
      */
     public static String chomp( String str )
@@ -119,14 +120,13 @@ public class ArtifactHashStatementsProducer
     }
 
     /**
-     * <p>Remove the last value of a supplied String, and everything after
-     * it from a String.</p>
-     *
+     * <p>
+     * Remove the last value of a supplied String, and everything after it from a String.
+     * </p>
+     * 
      * @param str String to chomp from
      * @param sep String to chomp
-     *
      * @return String without chomped ending
-     *
      * @throws NullPointerException if str or sep is <code>null</code>
      */
     public static String chomp( String str, String sep )

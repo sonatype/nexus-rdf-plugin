@@ -29,38 +29,19 @@ public class ItemPath
     /**
      * Maven repository containing the item.
      */
-    private final MavenRepository m_repository;
+    private final MavenRepository repository;
     /**
      * Path to item in repository.
      */
-    private final String m_path;
+    private final String path;
     /**
      * Calculated GAV for item (or null if an invalid path).
      */
-    private final Gav m_gav;
+    private final Gav gav;
     /**
      * Path to file on file system.
      */
-    private final File m_file;
-
-    /**
-     * Constructor.
-     *
-     * @param repository maven repository containing the item
-     * @param path       path to item in repository.
-     */
-    public ItemPath( final MavenRepository repository,
-                     final String path )
-    {
-        assert repository != null : "Item repository must be specified (cannot be null)";
-        assert path != null : "Item path must be specified (cannot be null)";
-        assert path.trim().length() != 0 : "Item path must be specified (cannot be empty)";
-
-        m_repository = repository;
-        m_file = new File( path );
-        m_path = path;
-        m_gav = calculateGav();
-    }
+    private final File file;
     
     /**
      * Constructor.
@@ -78,10 +59,10 @@ public class ItemPath
         assert path != null : "Item path must be specified (cannot be null)";
         assert path.trim().length() != 0 : "Item path must be specified (cannot be empty)";
 
-        m_repository = repository;
-        m_file = new File(repositoryRoot, path);
-        m_path = path;
-        m_gav = calculateGav();
+        this.repository = repository;
+        this.file = new File(repositoryRoot, path);
+        this.path = path;
+        gav = calculateGav();
     }
 
     /**
@@ -91,7 +72,7 @@ public class ItemPath
      */
     public String path()
     {
-        return m_path;
+        return path;
     }
 
     /**
@@ -101,7 +82,7 @@ public class ItemPath
      */
     public boolean isPathOfCustomMetadata()
     {
-        return m_path.startsWith( METADATA_DIR );
+        return path.startsWith( METADATA_DIR );
     }
 
     /**
@@ -111,7 +92,7 @@ public class ItemPath
      */
     public MavenRepository repository()
     {
-        return m_repository;
+        return repository;
     }
 
     /**
@@ -121,7 +102,7 @@ public class ItemPath
      */
     public Gav gav()
     {
-        return m_gav;
+        return gav;
     }
     
     /**
@@ -129,7 +110,7 @@ public class ItemPath
      */
     public File file()
     {
-        return m_file;
+        return file;
     }
 
     /**
@@ -142,13 +123,13 @@ public class ItemPath
         Gav gav = null;
         try
         {
-            if ( m_path.startsWith( METADATA_DIR ) )
+            if ( path.startsWith( METADATA_DIR ) )
             {
-                gav = m_repository.getGavCalculator().pathToGav( m_path.replace( METADATA_DIR, "" ) );
+                gav = repository.getGavCalculator().pathToGav( path.replace( METADATA_DIR, "" ) );
             }
             else
             {
-                gav = m_repository.getGavCalculator().pathToGav( m_path );
+                gav = repository.getGavCalculator().pathToGav( path );
             }
         }
         catch ( IllegalArtifactCoordinateException ignore )
@@ -175,11 +156,11 @@ public class ItemPath
 
         ItemPath itemPath = (ItemPath) o;
 
-        if ( !m_path.equals( itemPath.m_path ) )
+        if ( !path.equals( itemPath.path ) )
         {
             return false;
         }
-        if ( !m_repository.equals( itemPath.m_repository ) )
+        if ( !repository.equals( itemPath.repository ) )
         {
             return false;
         }
@@ -193,8 +174,8 @@ public class ItemPath
     @Override
     public int hashCode()
     {
-        int result = m_repository.hashCode();
-        result = 31 * result + m_path.hashCode();
+        int result = repository.hashCode();
+        result = 31 * result + path.hashCode();
         return result;
     }
 
@@ -204,7 +185,7 @@ public class ItemPath
     @Override
     public String toString()
     {
-        return String.format( "%s:%s", m_repository.getId(), m_path );
+        return String.format( "%s:%s", repository.getId(), path );
     }
 
 }

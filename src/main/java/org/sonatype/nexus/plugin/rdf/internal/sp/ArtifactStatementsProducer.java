@@ -17,6 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.model.Repository;
 import org.openrdf.model.Statement;
 import org.slf4j.Logger;
 import org.sonatype.nexus.plugin.rdf.ItemPath;
@@ -43,17 +44,18 @@ public class ArtifactStatementsProducer
     /**
      * {@inheritDoc}
      */
-    public Collection<Statement> parse( final ItemPath path )
+    public Collection<Statement> parse( final ItemPath path, Repository... remoteRepositories )
     {
         assert path != null : "Parsed path must be specified (cannot be null)";
 
         final Gav gav = path.gav();
-        assert gav != null : "Parsed path GAV must be specified (cannot be null)";
 
-        if ( path.isPathOfCustomMetadata() || path.gav().isHash() || path.gav().isSignature() )
+        if ( path.gav() == null || path.isPathOfCustomMetadata() || path.gav().isHash() || path.gav().isSignature() )
         {
             return Collections.emptyList();
         }
+        
+        logger.debug( String.format( "Producing artifact RDF statements for item [%s]", path ) );
         
         try
         {
