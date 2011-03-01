@@ -15,7 +15,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
  * Path to an item in a maven repository.
- *
+ * 
  * @author Alin Dreghiciu
  */
 public class ItemPath
@@ -30,25 +30,28 @@ public class ItemPath
      * Maven repository containing the item.
      */
     private final MavenRepository repository;
+
     /**
      * Path to item in repository.
      */
     private final String path;
+
     /**
      * Calculated GAV for item (or null if an invalid path).
      */
     private final Gav gav;
+
     /**
      * Path to file on file system.
      */
     private final File file;
-    
+
     /**
      * Constructor.
-     *
+     * 
      * @param repository maven repository containing the item
      * @param repositoryRoot repository root file
-     * @param path       path to item in repository.
+     * @param path path to item in repository.
      */
     public ItemPath( final MavenRepository repository,
                      final File repositoryRoot,
@@ -60,14 +63,19 @@ public class ItemPath
         assert path.trim().length() != 0 : "Item path must be specified (cannot be empty)";
 
         this.repository = repository;
-        this.file = new File(repositoryRoot, path);
-        this.path = path;
+        String canonicalPath = path.replace( "\\", "/" );
+        if ( canonicalPath.startsWith( "/" ) )
+        {
+            canonicalPath = canonicalPath.substring( 1 );
+        }
+        this.path = canonicalPath;
+        this.file = new File( repositoryRoot, canonicalPath );
         gav = calculateGav();
     }
 
     /**
      * Getter.
-     *
+     * 
      * @return item path
      */
     public String path()
@@ -77,7 +85,7 @@ public class ItemPath
 
     /**
      * Getter.
-     *
+     * 
      * @return true if the path is a path to a custom metadata file.
      */
     public boolean isPathOfCustomMetadata()
@@ -87,7 +95,7 @@ public class ItemPath
 
     /**
      * Getter.
-     *
+     * 
      * @return item repository
      */
     public MavenRepository repository()
@@ -97,14 +105,14 @@ public class ItemPath
 
     /**
      * Getter.
-     *
+     * 
      * @return item GAV or null if GAV cannot be calculated
      */
     public Gav gav()
     {
         return gav;
     }
-    
+
     /**
      * @return path to file on file system.
      */
@@ -115,7 +123,7 @@ public class ItemPath
 
     /**
      * Calculate the GAV for specified path.
-     *
+     * 
      * @return calculated GAV or null if GAV cannot be calculated
      */
     private Gav calculateGav()
