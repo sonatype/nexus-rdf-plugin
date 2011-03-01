@@ -14,8 +14,13 @@ public class RDFCapabilityFactory
     implements CapabilityFactory
 {
 
+    private final RDFStore rdfStore;
+    
     @Inject
-    private RDFStore rdfStore;
+    RDFCapabilityFactory(RDFStore rdfStore)
+    {
+        this.rdfStore = rdfStore;
+    }
 
     public Capability create( final String id )
     {

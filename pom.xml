@@ -91,6 +91,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sparql-endpoint</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
         
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -156,6 +161,7 @@
                     <componentDependencies>
                         <componentDependency>org.sonatype.sisu:rdf</componentDependency>
                         <componentDependency>org.sonatype.sisu:maven-bridge</componentDependency>
+                        <componentDependency>org.sonatype.sisu:sparql-endpoint</componentDependency>
                     </componentDependencies>
                 </configuration>
             </plugin>

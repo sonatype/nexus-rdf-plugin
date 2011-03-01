@@ -83,6 +83,13 @@ public class RDFConfiguration
         }
         return true;
     }
+    
+    @Override
+    public String toString()
+    {
+        return "RDFConfiguration [repositoryId=" + repositoryId + ", remoteRepositoriesIds="
+            + Arrays.toString( remoteRepositoriesIds ) + "]";
+    }
 
     private static String repository( final Map<String, String> properties )
     {
