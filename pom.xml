@@ -54,6 +54,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-web-utils</artifactId>
+            <version>${nexus.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.sonatype.nexus.plugins</groupId>
             <artifactId>nexus-capabilities-plugin</artifactId>
             <type>nexus-plugin</type>

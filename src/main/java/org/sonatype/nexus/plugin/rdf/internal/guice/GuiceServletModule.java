@@ -16,7 +16,7 @@ public class GuiceServletModule
     @Override
     protected void configureServlets()
     {
-        serve( "/sparql" ).with( SparqlServlet.class );
+        serve( "/sparql/*" ).with( SparqlServlet.class );
     }
 
 }
