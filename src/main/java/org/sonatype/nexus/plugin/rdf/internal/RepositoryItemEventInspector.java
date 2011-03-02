@@ -7,39 +7,32 @@
  */
 package org.sonatype.nexus.plugin.rdf.internal;
 
-import java.io.File;
-
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+
+import org.slf4j.Logger;
 import org.sonatype.nexus.plugin.rdf.ItemPath;
 import org.sonatype.nexus.plugin.rdf.RDFStore;
-import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.plexus.appevents.Event;
 
-/**
- * Listens on repository items stored / cached / deleted ({@see #accepts}) and indexes (or removes) metadata available
- * about this artifacts.
- * 
- * @author Alin Dreghiciu
- */
+@Named
 @Singleton
 public class RepositoryItemEventInspector
-    extends AbstractLoggingComponent
     implements EventInspector
 {
 
     private final RDFStore rdfStore;
+
+    @Inject
+    private Logger logger;
 
     @Inject
     public RepositoryItemEventInspector( final RDFStore rdfStore )
@@ -81,11 +74,11 @@ public class RepositoryItemEventInspector
         final RepositoryItemEvent event = (RepositoryItemEvent) evt;
         final MavenRepository repository = (MavenRepository) event.getRepository();
 
-        getLogger().debug(
-            String.format(
-                "Begin handling event of type %s on item %s",
-                evt.getClass().getSimpleName(), event.getItem().getPath()
-                  )
+        logger.debug(
+              String.format(
+                  "Begin handling event of type %s on item %s",
+                  evt.getClass().getSimpleName(), event.getItem().getPath()
+                    )
                    );
 
         try
@@ -101,14 +94,14 @@ public class RepositoryItemEventInspector
         }
         catch ( Exception e )
         {
-            getLogger().error( "Indexing skipped for event " + event, e );
+            logger.error( "Indexing skipped for event " + event, e );
         }
         finally
         {
-            getLogger().debug(
-                String.format(
-                    "End handling event of type %s on item %s", evt.getClass().getSimpleName(),
-                    event.getItem().getPath() ) );
+            logger.debug(
+                  String.format(
+                      "End handling event of type %s on item %s", evt.getClass().getSimpleName(),
+                      event.getItem().getPath() ) );
         }
     }
 
@@ -121,7 +114,7 @@ public class RepositoryItemEventInspector
     private void onItemAdded( final MavenRepository repository,
                               final RepositoryItemEvent event )
     {
-        rdfStore.index( new ItemPath( repository, getRepositoryLocalStorageAsFile( repository ),
+        rdfStore.index( new ItemPath( repository, Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
             event.getItem().getPath() ) );
     }
 
@@ -134,32 +127,8 @@ public class RepositoryItemEventInspector
     private void onItemRemoved( final MavenRepository repository,
                                 final RepositoryItemEvent event )
     {
-        rdfStore.remove( new ItemPath( repository, getRepositoryLocalStorageAsFile( repository ),
+        rdfStore.remove( new ItemPath( repository, Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
             event.getItem().getPath() ) );
-    }
-
-    protected File getRepositoryLocalStorageAsFile( Repository repository )
-    {
-        if ( repository.getLocalUrl() != null
-            && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
-        {
-            try
-            {
-                File baseDir =
-                    ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getBaseDir( repository,
-                        new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
-
-                return baseDir;
-            }
-            catch ( LocalStorageException e )
-            {
-                getLogger().warn(
-                    String.format( "Cannot determine \"%s\" (ID=%s) repository's basedir:", repository.getName(),
-                        repository.getId() ), e );
-            }
-        }
-
-        return null;
     }
 
 }

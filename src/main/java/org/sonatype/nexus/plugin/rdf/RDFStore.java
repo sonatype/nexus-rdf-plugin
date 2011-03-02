@@ -2,6 +2,7 @@ package org.sonatype.nexus.plugin.rdf;
 
 import static org.sonatype.sisu.rdf.RepositoryIdentity.repositoryIdentity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,9 +18,10 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
-import org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFConfiguration;
 import org.sonatype.sisu.rdf.RepositoryHub;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
+import org.sonatype.sisu.scanner.helper.ListenerSupport;
+import org.sonatype.sisu.scanner.scanners.SerialScanner;
 
 @Named
 @Singleton
@@ -59,23 +61,46 @@ public class RDFStore
         Collection<Statement> statements = new ArrayList<Statement>();
         for ( StatementsProducer producer : statementsProducers )
         {
-            statements.addAll( producer.parse( path, matchingConfig.remoteRepositories() ) );
+            statements.addAll( producer.parse( path, matchingConfig ) );
         }
-        if ( !statements.isEmpty() )
+        Repository repository = repositoryHub.repository( repositoryIdentity( matchingConfig.repositoryId() ) );
+        try
         {
-            Repository repository = repositoryHub.repository( repositoryIdentity( matchingConfig.repositoryId() ) );
-            try
+            RepositoryConnection conn = repository.getConnection();
+            conn.clear( mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
+            if ( !statements.isEmpty() )
             {
-                RepositoryConnection conn = repository.getConnection();
                 conn.add( statements, mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
-                conn.commit();
-                conn.close();
             }
-            catch ( RepositoryException e )
-            {
-                logger.warn( String.format( "Could not index item [%s] as RDF statements", path ), e );
-            }
+            conn.commit();
+            conn.close();
         }
+        catch ( RepositoryException e )
+        {
+            logger.warn( String.format( "Could not index item [%s] as RDF statements", path ), e );
+        }
+    }
+
+    public void scanAndIndex( final ItemPath path )
+    {
+        final RDFConfiguration matchingConfig = configurations.get( path.repository().getId() );
+        if ( matchingConfig == null )
+        {
+            return;
+        }
+
+        logger.debug( String.format( "About to scan item [%s]", path ) );
+
+        new SerialScanner().scan( path.file(), new ListenerSupport()
+        {
+
+            @Override
+            public void onFile( File file )
+            {
+                index( path.relative( file ) );
+            }
+
+        } );
     }
 
     public void remove( final ItemPath path )

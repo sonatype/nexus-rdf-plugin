@@ -18,10 +18,10 @@ import javax.inject.Singleton;
 
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Repository;
 import org.openrdf.model.Statement;
 import org.slf4j.Logger;
 import org.sonatype.nexus.plugin.rdf.ItemPath;
+import org.sonatype.nexus.plugin.rdf.RDFConfiguration;
 import org.sonatype.nexus.plugin.rdf.StatementsProducer;
 import org.sonatype.sisu.maven.bridge.MavenBridge;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
@@ -49,7 +49,7 @@ public class POMStatementsProducer
     /**
      * {@inheritDoc}
      */
-    public Collection<Statement> parse( final ItemPath path, Repository... remoteRepositories )
+    public Collection<Statement> parse( final ItemPath path, RDFConfiguration configuration )
     {
         assert path != null : "Parsed path must be specified (cannot be null)";
 
@@ -64,8 +64,13 @@ public class POMStatementsProducer
 
         try
         {
-            Model model = mavenBridge.buildModel( path.file(), remoteRepositories );
+            Model model = mavenBridge.buildModel( path.file(), configuration.remoteRepositories() );
             Collection<Statement> statements = mavenToRDF.model( model );
+            if ( configuration.projectOwner() != null )
+            {
+                statements.add( mavenToRDF.projectProperty( model.getGroupId(), model.getArtifactId(), "projectOwner",
+                    configuration.projectOwner() ) );
+            }
             return statements;
         }
         catch ( Exception ignore )

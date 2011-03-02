@@ -17,10 +17,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.model.Repository;
 import org.openrdf.model.Statement;
 import org.slf4j.Logger;
 import org.sonatype.nexus.plugin.rdf.ItemPath;
+import org.sonatype.nexus.plugin.rdf.RDFConfiguration;
 import org.sonatype.nexus.plugin.rdf.StatementsProducer;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
 
@@ -44,7 +44,7 @@ public class ArtifactStatementsProducer
     /**
      * {@inheritDoc}
      */
-    public Collection<Statement> parse( final ItemPath path, Repository... remoteRepositories )
+    public Collection<Statement> parse( final ItemPath path, RDFConfiguration configuration )
     {
         assert path != null : "Parsed path must be specified (cannot be null)";
 

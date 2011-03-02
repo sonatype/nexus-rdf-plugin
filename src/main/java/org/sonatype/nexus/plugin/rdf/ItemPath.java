@@ -11,6 +11,7 @@ import java.io.File;
 
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
+import org.sonatype.nexus.plugin.rdf.internal.Utils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 /**
@@ -47,6 +48,11 @@ public class ItemPath
     private final File file;
 
     /**
+     * Repository root file.
+     */
+    private final File repositoryRoot;
+
+    /**
      * Constructor.
      * 
      * @param repository maven repository containing the item
@@ -63,6 +69,7 @@ public class ItemPath
         assert path.trim().length() != 0 : "Item path must be specified (cannot be empty)";
 
         this.repository = repository;
+        this.repositoryRoot = repositoryRoot;
         String canonicalPath = path.replace( "\\", "/" );
         if ( canonicalPath.startsWith( "/" ) )
         {
@@ -106,6 +113,16 @@ public class ItemPath
     /**
      * Getter.
      * 
+     * @return item repository root file
+     */
+    public File repositoryRoot()
+    {
+        return repositoryRoot;
+    }
+
+    /**
+     * Getter.
+     * 
      * @return item GAV or null if GAV cannot be calculated
      */
     public Gav gav()
@@ -119,6 +136,19 @@ public class ItemPath
     public File file()
     {
         return file;
+    }
+
+    /**
+     * Create a new item path relative to passed item path root.
+     * 
+     * @param path path to item in repository.
+     */
+    public ItemPath relative( final File file )
+    {
+        assert path != null : "Item path must be specified (cannot be null)";
+        assert file != null : "File must be specified (cannot be null)";
+
+        return new ItemPath( repository(), repositoryRoot(), Utils.getRelativePath( repositoryRoot, file ) );
     }
 
     /**

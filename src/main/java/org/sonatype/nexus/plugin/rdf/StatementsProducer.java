@@ -9,12 +9,11 @@ package org.sonatype.nexus.plugin.rdf;
 
 import java.util.Collection;
 
-import org.apache.maven.model.Repository;
 import org.openrdf.model.Statement;
 
 public interface StatementsProducer
 {
 
-    Collection<Statement> parse( ItemPath path, Repository... remoteRepositories );
+    Collection<Statement> parse( ItemPath path, RDFConfiguration configuration );
 
 }

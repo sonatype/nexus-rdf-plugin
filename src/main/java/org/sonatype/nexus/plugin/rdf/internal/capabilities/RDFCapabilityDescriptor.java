@@ -18,16 +18,19 @@ public class RDFCapabilityDescriptor
 
     public static final String ID = RDFCapability.ID;
 
-    static final String REPO_OR_GROUP_ID = "repoOrGroup";
+    public static final String REPO_OR_GROUP_ID = "repoOrGroup";
 
     private final FormField repoOrGroup;
 
     private final FormField remoteRepositories;
+    
+    private final FormField projectOwner;
 
     public RDFCapabilityDescriptor()
     {
         repoOrGroup = new RepoOrGroupComboFormField( REPO_OR_GROUP_ID, FormField.MANDATORY );
         remoteRepositories = new RemoteRepositoriesFormField();
+        projectOwner = new ProjectOwnerFormField();
     }
 
     public String id()
@@ -42,7 +45,7 @@ public class RDFCapabilityDescriptor
 
     public List<FormField> formFields()
     {
-        return Arrays.asList( repoOrGroup, remoteRepositories );
+        return Arrays.asList( repoOrGroup, remoteRepositories, projectOwner );
     }
 
     public boolean isExposed()
