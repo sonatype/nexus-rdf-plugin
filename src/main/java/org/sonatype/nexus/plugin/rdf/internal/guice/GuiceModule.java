@@ -35,9 +35,9 @@ public class GuiceModule
             LocalRepositoryProvider.class );
         binder.bind( ModelResolver.class ).to( RemoteModelResolver.class );
         binder.bind( RepositorySystemSession.class ).toProvider( RepositorySystemSessionProvider.class );
-        
-        binder.bind(FilterDefinitions.class).to( DynamicFilterDefinitions.class );
-        binder.bind(ServletDefinitions.class).to( DynamicServletDefinitions.class );
+
+        binder.bind( FilterDefinitions.class ).to( DynamicFilterDefinitions.class );
+        binder.bind( ServletDefinitions.class ).to( DynamicServletDefinitions.class );
     }
 
 }
