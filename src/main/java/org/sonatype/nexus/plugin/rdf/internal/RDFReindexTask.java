@@ -6,7 +6,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.plugin.rdf.ItemPath;
+import org.sonatype.nexus.plugin.rdf.NexusItemPath;
 import org.sonatype.nexus.plugin.rdf.RDFStore;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
@@ -63,7 +63,7 @@ public class RDFReindexTask
             getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), MavenRepository.class );
 
         rdfStore.scanAndIndex(
-                new ItemPath( repository,
+                new NexusItemPath( repository,
                               Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
                               getResourceStorePath() ) );
 

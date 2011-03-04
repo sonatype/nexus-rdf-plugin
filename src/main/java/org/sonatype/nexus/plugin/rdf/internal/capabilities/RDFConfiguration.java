@@ -1,4 +1,4 @@
-package org.sonatype.nexus.plugin.rdf;
+package org.sonatype.nexus.plugin.rdf.internal.capabilities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,12 +7,11 @@ import java.util.Map;
 
 import org.apache.maven.model.Repository;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.plugin.rdf.internal.capabilities.ProjectOwnerFormField;
-import org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFCapabilityDescriptor;
-import org.sonatype.nexus.plugin.rdf.internal.capabilities.RemoteRepositoriesFormField;
 import org.sonatype.sisu.maven.bridge.MavenBuilder;
+import org.sonatype.sisu.rdf.StatementsProducerContext;
 
 public class RDFConfiguration
+    implements StatementsProducerContext
 {
 
     private final String repositoryId;

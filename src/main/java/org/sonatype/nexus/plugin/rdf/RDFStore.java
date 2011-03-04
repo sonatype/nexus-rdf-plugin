@@ -18,7 +18,9 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
+import org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFConfiguration;
 import org.sonatype.sisu.rdf.RepositoryHub;
+import org.sonatype.sisu.rdf.StatementsProducer;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
 import org.sonatype.sisu.scanner.helper.ListenerSupport;
 import org.sonatype.sisu.scanner.scanners.SerialScanner;
@@ -48,7 +50,7 @@ public class RDFStore
         configurations = new HashMap<String, RDFConfiguration>();
     }
 
-    public void index( final ItemPath path )
+    public void index( final NexusItemPath path )
     {
         final RDFConfiguration matchingConfig = configurations.get( path.repository().getId() );
         if ( matchingConfig == null )
@@ -81,7 +83,7 @@ public class RDFStore
         }
     }
 
-    public void scanAndIndex( final ItemPath path )
+    public void scanAndIndex( final NexusItemPath path )
     {
         final RDFConfiguration matchingConfig = configurations.get( path.repository().getId() );
         if ( matchingConfig == null )
@@ -103,7 +105,7 @@ public class RDFStore
         } );
     }
 
-    public void remove( final ItemPath path )
+    public void remove( final NexusItemPath path )
     {
         final RDFConfiguration matchingConfig = configurations.get( path.repository().getId() );
         if ( matchingConfig == null )

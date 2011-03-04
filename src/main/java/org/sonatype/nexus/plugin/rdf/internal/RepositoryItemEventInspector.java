@@ -12,7 +12,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
-import org.sonatype.nexus.plugin.rdf.ItemPath;
+import org.sonatype.nexus.plugin.rdf.NexusItemPath;
 import org.sonatype.nexus.plugin.rdf.RDFStore;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -114,7 +114,7 @@ public class RepositoryItemEventInspector
     private void onItemAdded( final MavenRepository repository,
                               final RepositoryItemEvent event )
     {
-        rdfStore.index( new ItemPath( repository, Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
+        rdfStore.index( new NexusItemPath( repository, Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
             event.getItem().getPath() ) );
     }
 
@@ -127,7 +127,7 @@ public class RepositoryItemEventInspector
     private void onItemRemoved( final MavenRepository repository,
                                 final RepositoryItemEvent event )
     {
-        rdfStore.remove( new ItemPath( repository, Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
+        rdfStore.remove( new NexusItemPath( repository, Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
             event.getItem().getPath() ) );
     }
 

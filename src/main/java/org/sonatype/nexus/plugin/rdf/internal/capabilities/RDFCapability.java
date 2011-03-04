@@ -2,7 +2,6 @@ package org.sonatype.nexus.plugin.rdf.internal.capabilities;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugin.rdf.RDFConfiguration;
 import org.sonatype.nexus.plugin.rdf.RDFStore;
 import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
 
