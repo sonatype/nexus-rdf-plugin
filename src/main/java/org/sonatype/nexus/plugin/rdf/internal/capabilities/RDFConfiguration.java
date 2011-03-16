@@ -22,12 +22,15 @@ public class RDFConfiguration
 
     private final String projectOwner;
 
+    private final String defaultLicense;
+
     public RDFConfiguration( final Map<String, String> properties )
     {
         repositoryId = repository( properties );
         remoteRepositoriesIds = remoteRepositoriesIds( properties );
         remoteRepositories = remoteRepositories( repositoryId, remoteRepositoriesIds );
         projectOwner = projectOwner( properties );
+        defaultLicense = defaultLicense( properties );
     }
 
     public String repositoryId()
@@ -44,10 +47,15 @@ public class RDFConfiguration
     {
         return remoteRepositories;
     }
-    
+
     public String projectOwner()
     {
         return projectOwner;
+    }
+
+    public String defaultLicense()
+    {
+        return defaultLicense;
     }
 
     @Override
@@ -55,6 +63,7 @@ public class RDFConfiguration
     {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ( ( defaultLicense == null ) ? 0 : defaultLicense.hashCode() );
         result = prime * result + ( ( projectOwner == null ) ? 0 : projectOwner.hashCode() );
         result = prime * result + Arrays.hashCode( remoteRepositoriesIds );
         result = prime * result + ( ( repositoryId == null ) ? 0 : repositoryId.hashCode() );
@@ -71,6 +80,13 @@ public class RDFConfiguration
         if ( getClass() != obj.getClass() )
             return false;
         RDFConfiguration other = (RDFConfiguration) obj;
+        if ( defaultLicense == null )
+        {
+            if ( other.defaultLicense != null )
+                return false;
+        }
+        else if ( !defaultLicense.equals( other.defaultLicense ) )
+            return false;
         if ( projectOwner == null )
         {
             if ( other.projectOwner != null )
@@ -98,10 +114,10 @@ public class RDFConfiguration
         builder.append( repositoryId );
         builder.append( ", remoteRepositoriesIds=" );
         builder.append( Arrays.toString( remoteRepositoriesIds ) );
-        builder.append( ", remoteRepositories=" );
-        builder.append( Arrays.toString( remoteRepositories ) );
         builder.append( ", projectOwner=" );
         builder.append( projectOwner );
+        builder.append( ", defaultLicense=" );
+        builder.append( defaultLicense );
         builder.append( "]" );
         return builder.toString();
     }
@@ -148,6 +164,16 @@ public class RDFConfiguration
             return null;
         }
         return projectOwner;
+    }
+
+    private static String defaultLicense( final Map<String, String> properties )
+    {
+        String defaultLicense = properties.get( ProjectOwnerFormField.ID );
+        if ( StringUtils.isBlank( defaultLicense ) )
+        {
+            return null;
+        }
+        return defaultLicense;
     }
 
 }

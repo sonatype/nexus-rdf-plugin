@@ -23,14 +23,17 @@ public class RDFCapabilityDescriptor
     private final FormField repoOrGroup;
 
     private final FormField remoteRepositories;
-    
+
     private final FormField projectOwner;
+
+    private final FormField defaultLicense;
 
     public RDFCapabilityDescriptor()
     {
         repoOrGroup = new RepoOrGroupComboFormField( REPO_OR_GROUP_ID, FormField.MANDATORY );
         remoteRepositories = new RemoteRepositoriesFormField();
         projectOwner = new ProjectOwnerFormField();
+        defaultLicense = new DefaultLicenseFormField();
     }
 
     public String id()
@@ -45,7 +48,7 @@ public class RDFCapabilityDescriptor
 
     public List<FormField> formFields()
     {
-        return Arrays.asList( repoOrGroup, remoteRepositories, projectOwner );
+        return Arrays.asList( repoOrGroup, remoteRepositories, projectOwner, defaultLicense );
     }
 
     public boolean isExposed()
