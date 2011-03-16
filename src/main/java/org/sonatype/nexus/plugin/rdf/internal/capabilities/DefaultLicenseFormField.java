@@ -15,7 +15,7 @@ public class DefaultLicenseFormField
 
     public String getLabel()
     {
-        return "DefaultLicense";
+        return "Default License";
     }
 
     public String getType()
