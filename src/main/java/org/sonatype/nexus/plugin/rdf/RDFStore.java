@@ -22,8 +22,8 @@ import org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFConfiguration;
 import org.sonatype.sisu.rdf.RepositoryHub;
 import org.sonatype.sisu.rdf.StatementsProducer;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
-import org.sonatype.sisu.scanner.helper.ListenerSupport;
-import org.sonatype.sisu.scanner.scanners.SerialScanner;
+import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
+import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
 @Named
 @Singleton
