@@ -195,9 +195,9 @@
                 </dependencies>
                 <configuration>
                     <componentDependencies>
-                        <componentDependency>org.sonatype.sisu:rdf</componentDependency>
-                        <componentDependency>org.sonatype.sisu:maven-bridge</componentDependency>
-                        <componentDependency>org.sonatype.sisu:sparql-endpoint</componentDependency>
+                        <componentDependency>org.sonatype.sisu:sisu-rdf</componentDependency>
+                        <componentDependency>org.sonatype.sisu:sisu-maven-bridge</componentDependency>
+                        <componentDependency>org.sonatype.sisu:sisu-sparql-endpoint</componentDependency>
                     </componentDependencies>
                 </configuration>
             </plugin>
