@@ -168,7 +168,7 @@ public class RDFConfiguration
 
     private static String defaultLicense( final Map<String, String> properties )
     {
-        String defaultLicense = properties.get( ProjectOwnerFormField.ID );
+        String defaultLicense = properties.get( DefaultLicenseFormField.ID );
         if ( StringUtils.isBlank( defaultLicense ) )
         {
             return null;
