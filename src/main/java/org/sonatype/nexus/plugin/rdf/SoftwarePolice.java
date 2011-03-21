@@ -6,16 +6,20 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.openrdf.repository.RepositoryException;
+import org.openrdf.repository.sparql.SPARQLRepository;
 import org.slf4j.Logger;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.plugin.rdf.internal.SPARQLEndpoints;
 import org.sonatype.nexus.plugin.rdf.internal.SoftwarePoliceFeedSource;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.sisu.rdf.maven.MAVEN;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
 import org.sonatype.sisu.rdf.query.Parameter;
 import org.sonatype.sisu.rdf.query.QueryDiff;
+import org.sonatype.sisu.rdf.query.QueryHistoryId;
 import org.sonatype.sisu.rdf.query.QueryResultBindingSet;
 import org.sonatype.sisu.rdf.query.QueryResultDiff;
 import org.sonatype.sisu.rdf.query.helper.QueryFile;
@@ -36,10 +40,14 @@ public class SoftwarePolice
 
     private final MavenToRDF mavenToRDF;
 
+    private final SPARQLEndpoints sparqlEndpoints;
+
     @Inject
-    public SoftwarePolice( FeedRecorder feedRecorder, QueryDiff queryDiff, MavenToRDF mavenToRDF )
+    public SoftwarePolice( FeedRecorder feedRecorder, SPARQLEndpoints sparqlEndpoints, QueryDiff queryDiff,
+                           MavenToRDF mavenToRDF )
     {
         this.feedRecorder = feedRecorder;
+        this.sparqlEndpoints = sparqlEndpoints;
         this.queryDiff = queryDiff;
         this.mavenToRDF = mavenToRDF;
     }
@@ -50,11 +58,20 @@ public class SoftwarePolice
             "About to check vulnerabilities from repository [%s] against SPARQL endpoints [%s]",
             repository.getId(), vulnerabilitiesSPARQLEndpoints ) );
 
+        if ( !sparqlEndpoints.isEnabledFor( repository.getId() ) )
+        {
+            logger.debug( String.format(
+                "Cannot check vulnerabilities from repository [%s] against SPARQL endpoints as repository does not have an SPARQL capability",
+                repository.getId() ) );
+            return;
+        }
+
         if ( vulnerabilitiesSPARQLEndpoints == null )
         {
             logger.warn( String.format(
                 "Cannot check vulnerabilities from repository [%s] against SPARQL endpoints as there is no endpoint to check against",
                 repository.getId() ) );
+            return;
         }
 
         QueryFile queryFile = QueryFile.fromClasspath( "queries/vulnerabilities.sparql" );
@@ -62,8 +79,13 @@ public class SoftwarePolice
         for ( String vulnerabilitiesSPARQLEndpoint : vulnerabilitiesSPARQLEndpoints.split( "," ) )
         {
             QueryResultDiff diff =
-                queryDiff.diffPrevious( federatedRepository, queryFile.query(), queryFile.queryLanguage(),
-                    Parameter.parameter( "nexusSPARQLEndpoint", null ),
+                queryDiff.diffPrevious(
+                    QueryHistoryId.hashOf( "nexus:/vulnerabilities/" + repository.getId() ),
+                    federatedRepository(),
+                    queryFile.query(),
+                    queryFile.queryLanguage(),
+                    Parameter.parameter( "nexusSPARQLEndpoint",
+                        "http://localhost:8081/nexus/sparql/" + repository.getId() ),
                     Parameter.parameter( "vulnerabilitiesSPARQLEndpoint", vulnerabilitiesSPARQLEndpoint ) );
             if ( diff != null )
             {
@@ -99,5 +121,30 @@ public class SoftwarePolice
                 projectVersion, vulnerability, dependency ), ai );
 
         feedRecorder.addNexusArtifactEvent( nae );
+    }
+
+    private org.openrdf.repository.Repository federatedRepository()
+    {
+        if ( federatedRepository == null )
+        {
+            final String url = "http://localhost:3030/testmatrix/query";
+            federatedRepository = new SPARQLRepository( url )
+            {
+                @Override
+                public String toString()
+                {
+                    return "SPARQL [url=" + url + "]";
+                }
+            };
+            try
+            {
+                federatedRepository.initialize();
+            }
+            catch ( RepositoryException e )
+            {
+                throw new RuntimeException( e );
+            }
+        }
+        return federatedRepository;
     }
 }

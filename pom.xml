@@ -166,6 +166,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>org.openrdf.alibaba</groupId>
+            <artifactId>alibaba-repository-sparql</artifactId>
+            <version>2.0-beta4</version>
+        </dependency>
         
         <!-- force versions -->
         <dependency>
@@ -207,6 +213,7 @@
                 <configuration>
                     <componentDependencies>
                         <componentDependency>org.sonatype.sisu:sisu-rdf</componentDependency>
+                        <componentDependency>org.sonatype.sisu:sisu-rdf-query</componentDependency>
                         <componentDependency>org.sonatype.sisu:sisu-maven-bridge</componentDependency>
                         <componentDependency>org.sonatype.sisu:sisu-sparql-endpoint</componentDependency>
                     </componentDependencies>

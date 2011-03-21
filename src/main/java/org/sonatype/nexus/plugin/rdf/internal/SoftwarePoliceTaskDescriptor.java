@@ -10,12 +10,12 @@ import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = SoftwarePoliceTaskDescriptor.ID, description = "Software Police Check" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "SoftwarePolice", description = "Software Police Check" )
 public class SoftwarePoliceTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
 
-    public static final String ID = "SoftwarePolice";
+    public static final String ID = "SoftwarePoliceTask";
 
     public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 

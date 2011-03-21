@@ -33,6 +33,11 @@ public class SPARQLEndpoints
         configurations = new HashMap<String, SPARQLEndpointConfiguration>();
     }
 
+    public boolean isEnabledFor( String repositoryId )
+    {
+        return configurations.containsKey( repositoryId );
+    }
+
     @Override
     protected Repository findRepository( String repositoryId )
     {

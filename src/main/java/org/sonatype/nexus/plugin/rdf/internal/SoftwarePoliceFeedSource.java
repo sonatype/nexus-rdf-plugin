@@ -30,7 +30,7 @@ public class SoftwarePoliceFeedSource
     @Inject
     private FeedRecorder feedRecorder;
 
-    @Named( "artifact" )
+    @Named( "softwarePolice" )
     @Inject
     private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
 
