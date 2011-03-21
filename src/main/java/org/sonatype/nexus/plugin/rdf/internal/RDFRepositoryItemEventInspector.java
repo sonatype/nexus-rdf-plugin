@@ -25,7 +25,7 @@ import org.sonatype.plexus.appevents.Event;
 
 @Named
 @Singleton
-public class RepositoryItemEventInspector
+public class RDFRepositoryItemEventInspector
     implements EventInspector
 {
 
@@ -35,7 +35,7 @@ public class RepositoryItemEventInspector
     private Logger logger;
 
     @Inject
-    public RepositoryItemEventInspector( final RDFStore rdfStore )
+    public RDFRepositoryItemEventInspector( final RDFStore rdfStore )
     {
         assert rdfStore != null : "RDF Store Service must be specified (cannot be null)";
         this.rdfStore = rdfStore;

@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugin.rdf.internal;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -59,13 +61,29 @@ public class RDFReindexTask
     protected Object doRun()
         throws Exception
     {
-        MavenRepository repository =
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), MavenRepository.class );
+        String repositoryId = getRepositoryId();
+        if ( repositoryId != null )
+        {
+            MavenRepository repository =
+                getRepositoryRegistry().getRepositoryWithFacet( repositoryId, MavenRepository.class );
 
-        rdfStore.scanAndIndex(
-                new NexusItemPath( repository,
+            rdfStore.scanAndIndex(
+                    new NexusItemPath( repository,
                               Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
                               getResourceStorePath() ) );
+        }
+        else
+        {
+            List<MavenRepository> repositories =
+                getRepositoryRegistry().getRepositoriesWithFacet( MavenRepository.class );
+            for ( MavenRepository repository : repositories )
+            {
+                rdfStore.scanAndIndex(
+                        new NexusItemPath( repository,
+                                  Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
+                                  getResourceStorePath() ) );
+            }
+        }
 
         return null;
     }
