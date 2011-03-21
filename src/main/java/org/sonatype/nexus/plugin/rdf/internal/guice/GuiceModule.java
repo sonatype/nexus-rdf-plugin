@@ -30,9 +30,12 @@ public class GuiceModule
     public void configure( Binder binder )
     {
         binder.bind( File.class ).annotatedWith( Names.named( LOCAL_STORAGE_DIR ) ).toProvider(
-            StorageDirProvider.class );
+            NexusConfigurationStorageDirProvider.class );
         binder.bind( File.class ).annotatedWith( Names.named( LOCAL_REPOSITORY_DIR ) ).toProvider(
             LocalRepositoryProvider.class );
+        binder.bind( File.class ).annotatedWith( Names.named( org.sonatype.sisu.rdf.query.Names.HISTORY_HUB_STORAGE ) ).toProvider(
+            NexusConfigurationStorageDirProvider.class );
+
         binder.bind( ModelResolver.class ).to( RemoteModelResolver.class );
         binder.bind( RepositorySystemSession.class ).toProvider( RepositorySystemSessionProvider.class );
 

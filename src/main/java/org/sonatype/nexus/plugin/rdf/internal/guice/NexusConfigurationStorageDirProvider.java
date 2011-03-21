@@ -11,14 +11,14 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 
 @Named
 @Singleton
-public class StorageDirProvider
+public class NexusConfigurationStorageDirProvider
     implements Provider<File>
 {
 
     private final NexusConfiguration nexusConfiguration;
 
     @Inject
-    public StorageDirProvider( NexusConfiguration nexusConfiguration )
+    public NexusConfigurationStorageDirProvider( NexusConfiguration nexusConfiguration )
     {
         this.nexusConfiguration = nexusConfiguration;
     }

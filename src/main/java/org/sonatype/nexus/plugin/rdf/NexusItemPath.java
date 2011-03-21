@@ -11,7 +11,6 @@ import java.io.File;
 
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.plugin.rdf.internal.Utils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.sisu.rdf.ItemPath;
@@ -46,8 +45,8 @@ public class NexusItemPath
                           final File repositoryRoot,
                           final String path )
     {
-        super(repositoryRoot,path,repository.getGavCalculator());
-        
+        super( repositoryRoot, path, repository.getGavCalculator() );
+
         assert repository != null : "Item repository must be specified (cannot be null)";
 
         this.repository = repository;
@@ -105,7 +104,7 @@ public class NexusItemPath
                 gav = super.calculateGav( path, gavCalculator );
             }
         }
-        catch ( IllegalArtifactCoordinateException ignore )
+        catch ( Exception ignore )
         {
             // ignore
         }
