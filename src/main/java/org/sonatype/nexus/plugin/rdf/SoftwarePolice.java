@@ -91,13 +91,14 @@ public class SoftwarePolice
             {
                 for ( QueryResultBindingSet bindingSet : diff.added() )
                 {
-                    String message = "New vulnerability %2$s found for artifact %1$s due to dependency %3$s";
+                    String message =
+                        "New vulnerability <a href=\"%2$s\">%2$s</a> found for artifact %1$s due to dependency %3$s";
                     record( bindingSet, message, repository );
 
                 }
                 for ( QueryResultBindingSet bindingSet : diff.removed() )
                 {
-                    String message = "Artifact %1$s does not longer has vulnerability %2$s";
+                    String message = "Artifact %1$s does not longer has vulnerability <a href=\"%2$s\">%2$s</a>";
                     record( bindingSet, message, repository );
 
                 }
