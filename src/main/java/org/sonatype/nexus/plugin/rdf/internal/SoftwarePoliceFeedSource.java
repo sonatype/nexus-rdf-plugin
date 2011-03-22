@@ -67,7 +67,7 @@ public class SoftwarePoliceFeedSource
     @Override
     public String getTitle()
     {
-        return "Artifacts with vulnerabilities";
+        return "Projects with vulnerabilities";
     }
 
     @Override
