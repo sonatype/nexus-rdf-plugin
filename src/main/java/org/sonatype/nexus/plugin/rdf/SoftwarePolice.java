@@ -7,7 +7,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.sparql.SPARQLRepository;
 import org.slf4j.Logger;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.FeedRecorder;
@@ -23,6 +22,7 @@ import org.sonatype.sisu.rdf.query.QueryHistoryId;
 import org.sonatype.sisu.rdf.query.QueryResultBindingSet;
 import org.sonatype.sisu.rdf.query.QueryResultDiff;
 import org.sonatype.sisu.rdf.query.helper.QueryFile;
+import org.sonatype.sisu.rdf.sesame.jena.SPARQLFederationRepository;
 
 @Named
 @Singleton
@@ -128,15 +128,7 @@ public class SoftwarePolice
     {
         if ( federatedRepository == null )
         {
-            final String url = "http://localhost:3030/testmatrix/query";
-            federatedRepository = new SPARQLRepository( url )
-            {
-                @Override
-                public String toString()
-                {
-                    return "SPARQL [url=" + url + "]";
-                }
-            };
+            federatedRepository = new SPARQLFederationRepository();
             try
             {
                 federatedRepository.initialize();
