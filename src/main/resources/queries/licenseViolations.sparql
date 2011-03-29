@@ -19,7 +19,7 @@ WHERE {
     SERVICE <${sparqlEndpoint}>
     { 
         ?dependencyProjectVersion maven:license ?license .
-        ?license maven:permissive "no" .
+        ?license license:permissive "no" .
     }
 
 }
