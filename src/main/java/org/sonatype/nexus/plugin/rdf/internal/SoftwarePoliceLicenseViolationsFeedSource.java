@@ -18,14 +18,16 @@ import org.sonatype.nexus.rest.feeds.sources.SyndEntryBuilder;
 import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
 import org.sonatype.timeline.TimelineFilter;
 
-@Named( "softwarePolice" )
+@Named( "softwarePoliceLicenseViolations" )
 @Singleton
-public class SoftwarePoliceFeedSource
+public class SoftwarePoliceLicenseViolationsFeedSource
     extends AbstractNexusItemEventFeedSource
     implements FeedSource
 {
 
-    public static final String ACTION = "softwarePolice";
+    public static final String ACTION = "softwarePoliceLicenseViolations";
+
+    public static final String CHANNEL_KEY = "softwarePoliceLicenseViolations";
 
     @Inject
     private FeedRecorder feedRecorder;
@@ -33,8 +35,6 @@ public class SoftwarePoliceFeedSource
     @Named( "softwarePolice" )
     @Inject
     private SyndEntryBuilder<NexusArtifactEvent> entryBuilder;
-
-    public static final String CHANNEL_KEY = "softwarePolice";
 
     public String getFeedKey()
     {
@@ -49,7 +49,7 @@ public class SoftwarePoliceFeedSource
     @Override
     public String getDescription()
     {
-        return "Software Police artifact checks in all Nexus repositories.";
+        return "Software Police License Violations in all Nexus repositories.";
     }
 
     @Override
@@ -67,7 +67,7 @@ public class SoftwarePoliceFeedSource
     @Override
     public String getTitle()
     {
-        return "Projects with vulnerabilities";
+        return "Projects using license violations";
     }
 
     @Override

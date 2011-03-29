@@ -12,7 +12,8 @@ import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.plugin.rdf.internal.SPARQLEndpoints;
-import org.sonatype.nexus.plugin.rdf.internal.SoftwarePoliceFeedSource;
+import org.sonatype.nexus.plugin.rdf.internal.SoftwarePoliceLicenseViolationsFeedSource;
+import org.sonatype.nexus.plugin.rdf.internal.SoftwarePoliceVulnerabilitiesFeedSource;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.sisu.rdf.maven.MAVEN;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
@@ -75,7 +76,7 @@ public class SoftwarePolice
         }
 
         checkVulnerabilities( repository, sparqlEndpoint );
-        checkLicenses( repository, sparqlEndpoint );
+        checkLicenseViolations( repository, sparqlEndpoint );
     }
 
     private void checkVulnerabilities( final MavenRepository repository, final String sparqlEndpoint )
@@ -120,19 +121,19 @@ public class SoftwarePolice
         ai.setRepositoryId( repository.getId() );
 
         NexusArtifactEvent nae =
-            new NexusArtifactEvent( new Date(), SoftwarePoliceFeedSource.ACTION, String.format( message,
+            new NexusArtifactEvent( new Date(), SoftwarePoliceVulnerabilitiesFeedSource.ACTION, String.format( message,
                 projectVersion, vulnerability, dependency ), ai );
 
         feedRecorder.addNexusArtifactEvent( nae );
     }
 
-    private void checkLicenses( final MavenRepository repository, final String sparqlEndpoint )
+    private void checkLicenseViolations( final MavenRepository repository, final String sparqlEndpoint )
     {
-        QueryFile queryFile = QueryFile.fromClasspath( "queries/licenses.sparql" );
+        QueryFile queryFile = QueryFile.fromClasspath( "queries/licenseViolations.sparql" );
 
         QueryResultDiff diff =
                 queryDiff.diffPrevious(
-                    QueryHistoryId.hashOf( "nexus:/licenses/" + repository.getId() ),
+                    QueryHistoryId.hashOf( "nexus:/licenseViolations/" + repository.getId() ),
                     federatedRepository(),
                     queryFile.query(),
                     queryFile.queryLanguage(),
@@ -144,20 +145,20 @@ public class SoftwarePolice
             for ( QueryResultBindingSet bindingSet : diff.added() )
             {
                 String message =
-                        "New viral license <a href=\"%2$s\">%2$s</a> found for artifact %1$s due to dependency %3$s";
-                recordLicenses( bindingSet, message, repository );
+                        "New license violation <a href=\"%2$s\">%2$s</a> found for artifact %1$s due to dependency %3$s";
+                recordLicenseViolation( bindingSet, message, repository );
 
             }
             for ( QueryResultBindingSet bindingSet : diff.removed() )
             {
-                String message = "Artifact %1$s does not longer depends on viral license <a href=\"%2$s\">%2$s</a>";
-                recordLicenses( bindingSet, message, repository );
+                String message = "Artifact %1$s does not longer has license violation <a href=\"%2$s\">%2$s</a>";
+                recordLicenseViolation( bindingSet, message, repository );
 
             }
         }
     }
 
-    private void recordLicenses( QueryResultBindingSet bindingSet, String message, MavenRepository repository )
+    private void recordLicenseViolation( QueryResultBindingSet bindingSet, String message, MavenRepository repository )
     {
         String projectVersion = bindingSet.get( "projectVersion" ).value().replace( MAVEN.URI_NAMESPACE, "" );
         String license = bindingSet.get( "license" ).value();
@@ -168,7 +169,8 @@ public class SoftwarePolice
         ai.setRepositoryId( repository.getId() );
 
         NexusArtifactEvent nae =
-            new NexusArtifactEvent( new Date(), SoftwarePoliceFeedSource.ACTION, String.format( message,
+            new NexusArtifactEvent( new Date(), SoftwarePoliceLicenseViolationsFeedSource.ACTION, String.format(
+                message,
                 projectVersion, license, dependency ), ai );
 
         feedRecorder.addNexusArtifactEvent( nae );

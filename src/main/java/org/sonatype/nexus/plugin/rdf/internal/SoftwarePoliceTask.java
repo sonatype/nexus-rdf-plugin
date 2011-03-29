@@ -32,7 +32,7 @@ public class SoftwarePoliceTask
     @Override
     protected String getAction()
     {
-        return SoftwarePoliceFeedSource.ACTION;
+        return SoftwarePoliceTaskDescriptor.ID;
     }
 
     @Override
