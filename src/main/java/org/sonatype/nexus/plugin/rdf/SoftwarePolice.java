@@ -40,45 +40,49 @@ public class SoftwarePolice
 
     private final MavenToRDF mavenToRDF;
 
-    private final SPARQLEndpoints sparqlEndpoints;
+    private final SPARQLEndpoints nexusSPARQLEndpoints;
 
     @Inject
-    public SoftwarePolice( FeedRecorder feedRecorder, SPARQLEndpoints sparqlEndpoints, QueryDiff queryDiff,
+    public SoftwarePolice( FeedRecorder feedRecorder, SPARQLEndpoints nexusSPARQLEndpoints, QueryDiff queryDiff,
                            MavenToRDF mavenToRDF )
     {
         this.feedRecorder = feedRecorder;
-        this.sparqlEndpoints = sparqlEndpoints;
+        this.nexusSPARQLEndpoints = nexusSPARQLEndpoints;
         this.queryDiff = queryDiff;
         this.mavenToRDF = mavenToRDF;
     }
 
-    public void check( final MavenRepository repository, final String vulnerabilitiesSPARQLEndpoints )
+    public void check( final MavenRepository repository, final String sparqlEndpoint )
     {
         logger.debug( String.format(
-            "About to check vulnerabilities from repository [%s] against SPARQL endpoints [%s]",
-            repository.getId(), vulnerabilitiesSPARQLEndpoints ) );
+            "About to check repository [%s] against SPARQL endpoint [%s]",
+            repository.getId(), sparqlEndpoint ) );
 
-        if ( !sparqlEndpoints.isEnabledFor( repository.getId() ) )
+        if ( !nexusSPARQLEndpoints.isEnabledFor( repository.getId() ) )
         {
             logger.debug( String.format(
-                "Cannot check vulnerabilities from repository [%s] against SPARQL endpoints as repository does not have an SPARQL capability",
+                "Cannot check repository [%s] against SPARQL endpoint as repository does not have an SPARQL capability",
                 repository.getId() ) );
             return;
         }
 
-        if ( vulnerabilitiesSPARQLEndpoints == null )
+        if ( sparqlEndpoint == null )
         {
             logger.warn( String.format(
-                "Cannot check vulnerabilities from repository [%s] against SPARQL endpoints as there is no endpoint to check against",
+                "Cannot check repository [%s] against SPARQL endpoint as there is no endpoint to check against",
                 repository.getId() ) );
             return;
         }
 
+        checkVulnerabilities( repository, sparqlEndpoint );
+        checkLicenses( repository, sparqlEndpoint );
+    }
+
+    private void checkVulnerabilities( final MavenRepository repository, final String sparqlEndpoint )
+    {
         QueryFile queryFile = QueryFile.fromClasspath( "queries/vulnerabilities.sparql" );
 
-        for ( String vulnerabilitiesSPARQLEndpoint : vulnerabilitiesSPARQLEndpoints.split( "," ) )
-        {
-            QueryResultDiff diff =
+        QueryResultDiff diff =
                 queryDiff.diffPrevious(
                     QueryHistoryId.hashOf( "nexus:/vulnerabilities/" + repository.getId() ),
                     federatedRepository(),
@@ -86,28 +90,26 @@ public class SoftwarePolice
                     queryFile.queryLanguage(),
                     Parameter.parameter( "nexusSPARQLEndpoint",
                         "http://localhost:8081/nexus/sparql/" + repository.getId() ),
-                    Parameter.parameter( "vulnerabilitiesSPARQLEndpoint", vulnerabilitiesSPARQLEndpoint ) );
-            if ( diff != null )
+                    Parameter.parameter( "sparqlEndpoint", sparqlEndpoint ) );
+        if ( diff != null )
+        {
+            for ( QueryResultBindingSet bindingSet : diff.added() )
             {
-                for ( QueryResultBindingSet bindingSet : diff.added() )
-                {
-                    String message =
+                String message =
                         "New vulnerability <a href=\"%2$s\">%2$s</a> found for artifact %1$s due to dependency %3$s";
-                    record( bindingSet, message, repository );
+                recordVulnerabilities( bindingSet, message, repository );
 
-                }
-                for ( QueryResultBindingSet bindingSet : diff.removed() )
-                {
-                    String message = "Artifact %1$s does not longer has vulnerability <a href=\"%2$s\">%2$s</a>";
-                    record( bindingSet, message, repository );
+            }
+            for ( QueryResultBindingSet bindingSet : diff.removed() )
+            {
+                String message = "Artifact %1$s does not longer has vulnerability <a href=\"%2$s\">%2$s</a>";
+                recordVulnerabilities( bindingSet, message, repository );
 
-                }
             }
         }
-
     }
 
-    private void record( QueryResultBindingSet bindingSet, String message, MavenRepository repository )
+    private void recordVulnerabilities( QueryResultBindingSet bindingSet, String message, MavenRepository repository )
     {
         String projectVersion = bindingSet.get( "projectVersion" ).value().replace( MAVEN.URI_NAMESPACE, "" );
         String vulnerability = bindingSet.get( "vulnerability" ).value();
@@ -120,6 +122,54 @@ public class SoftwarePolice
         NexusArtifactEvent nae =
             new NexusArtifactEvent( new Date(), SoftwarePoliceFeedSource.ACTION, String.format( message,
                 projectVersion, vulnerability, dependency ), ai );
+
+        feedRecorder.addNexusArtifactEvent( nae );
+    }
+
+    private void checkLicenses( final MavenRepository repository, final String sparqlEndpoint )
+    {
+        QueryFile queryFile = QueryFile.fromClasspath( "queries/licenses.sparql" );
+
+        QueryResultDiff diff =
+                queryDiff.diffPrevious(
+                    QueryHistoryId.hashOf( "nexus:/licenses/" + repository.getId() ),
+                    federatedRepository(),
+                    queryFile.query(),
+                    queryFile.queryLanguage(),
+                    Parameter.parameter( "nexusSPARQLEndpoint",
+                        "http://localhost:8081/nexus/sparql/" + repository.getId() ),
+                    Parameter.parameter( "sparqlEndpoint", sparqlEndpoint ) );
+        if ( diff != null )
+        {
+            for ( QueryResultBindingSet bindingSet : diff.added() )
+            {
+                String message =
+                        "New viral license <a href=\"%2$s\">%2$s</a> found for artifact %1$s due to dependency %3$s";
+                recordLicenses( bindingSet, message, repository );
+
+            }
+            for ( QueryResultBindingSet bindingSet : diff.removed() )
+            {
+                String message = "Artifact %1$s does not longer depends on viral license <a href=\"%2$s\">%2$s</a>";
+                recordLicenses( bindingSet, message, repository );
+
+            }
+        }
+    }
+
+    private void recordLicenses( QueryResultBindingSet bindingSet, String message, MavenRepository repository )
+    {
+        String projectVersion = bindingSet.get( "projectVersion" ).value().replace( MAVEN.URI_NAMESPACE, "" );
+        String license = bindingSet.get( "license" ).value();
+        String dependency = bindingSet.get( "dependencyProjectVersion" ).value().replace( MAVEN.URI_NAMESPACE, "" );
+
+        NexusItemInfo ai = new NexusItemInfo();
+        ai.setPath( repository.getGavCalculator().gavToPath( mavenToRDF.gavOfProjectVersion( projectVersion ) ) );
+        ai.setRepositoryId( repository.getId() );
+
+        NexusArtifactEvent nae =
+            new NexusArtifactEvent( new Date(), SoftwarePoliceFeedSource.ACTION, String.format( message,
+                projectVersion, license, dependency ), ai );
 
         feedRecorder.addNexusArtifactEvent( nae );
     }
@@ -140,4 +190,5 @@ public class SoftwarePolice
         }
         return federatedRepository;
     }
+
 }

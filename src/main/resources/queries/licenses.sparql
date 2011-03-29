@@ -1,9 +1,10 @@
-# find all projects that have a vulnerability
+# find all projects that have a viral license
 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX maven: <http://maven.apache.org/artifact#>
+PREFIX license: <http://maven.apache.org/license#>
 
-SELECT DISTINCT ?projectVersion ?dependencyProjectVersion ?vulnerability
+SELECT DISTINCT ?projectVersion ?dependencyProjectVersion ?license
 
 WHERE {
     
@@ -17,7 +18,8 @@ WHERE {
     
     SERVICE <${sparqlEndpoint}>
     { 
-        ?dependencyProjectVersion maven:vulnerability ?vulnerability .
+        ?dependencyProjectVersion maven:license ?license .
+        ?license maven:permissive "no" .
     }
 
 }

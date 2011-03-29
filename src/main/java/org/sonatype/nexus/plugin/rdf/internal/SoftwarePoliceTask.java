@@ -23,9 +23,9 @@ public class SoftwarePoliceTask
         return SoftwarePoliceTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
     }
 
-    public String getVulnerabilitiesSPARQLEndpoints()
+    public String getSPARQLEndpoint()
     {
-        final String uris = getParameters().get( SoftwarePoliceTaskDescriptor.VULNERABILITIES_SPARQL_ENDPOINTS );
+        final String uris = getParameters().get( SoftwarePoliceTaskDescriptor.SPARQL_ENDPOINT );
         return uris;
     }
 
@@ -40,14 +40,14 @@ public class SoftwarePoliceTask
     {
         if ( getRepositoryId() != null )
         {
-            return String.format( "Checking repository [%s] for vulnerabilities against SPARQL endpoints %s",
-                getRepositoryId(), getVulnerabilitiesSPARQLEndpoints() );
+            return String.format( "Software Police checking repository [%s] against SPARQL endpoint %s",
+                getRepositoryId(), getSPARQLEndpoint() );
         }
         else
         {
             return String.format(
-                "Checking all configured repositories for vulnerabilities against SPARQL endpoints %s",
-                getVulnerabilitiesSPARQLEndpoints() );
+                "Software Police checking all configured repositories against SPARQL endpoint %s",
+                getSPARQLEndpoint() );
         }
     }
 
@@ -60,7 +60,7 @@ public class SoftwarePoliceTask
         {
             MavenRepository repository =
                 getRepositoryRegistry().getRepositoryWithFacet( repositoryId, MavenRepository.class );
-            softwarePolice.check( repository, getVulnerabilitiesSPARQLEndpoints() );
+            softwarePolice.check( repository, getSPARQLEndpoint() );
         }
         else
         {
@@ -68,7 +68,7 @@ public class SoftwarePoliceTask
                 getRepositoryRegistry().getRepositoriesWithFacet( MavenRepository.class );
             for ( MavenRepository repository : repositories )
             {
-                softwarePolice.check( repository, getVulnerabilitiesSPARQLEndpoints() );
+                softwarePolice.check( repository, getSPARQLEndpoint() );
             }
         }
 

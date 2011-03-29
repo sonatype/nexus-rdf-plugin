@@ -19,15 +19,15 @@ public class SoftwarePoliceTaskDescriptor
 
     public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
-    public static final String VULNERABILITIES_SPARQL_ENDPOINTS = "vulnerabilitiesSPARQLEndpoints";
+    public static final String SPARQL_ENDPOINT = "sparqlEndpoint";
 
     private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
         FormField.MANDATORY );
 
-    private final StringTextFormField vulnerabilitiesSPARQLEndpoints = new StringTextFormField(
-        VULNERABILITIES_SPARQL_ENDPOINTS,
-        "Vulnerabilities SPARQL Endpoints URLs",
-        "Enter a comma separated list of vulnerabilities SPARQL Endpoints URLs to check against",
+    private final StringTextFormField sparqlEndpoint = new StringTextFormField(
+        SPARQL_ENDPOINT,
+        "SPARQL Endpoint URL",
+        "SPARQL Endpoint URLs to check against",
         FormField.MANDATORY );
 
     public String getId()
@@ -46,7 +46,7 @@ public class SoftwarePoliceTaskDescriptor
         List<FormField> fields = new ArrayList<FormField>();
 
         fields.add( repoField );
-        fields.add( vulnerabilitiesSPARQLEndpoints );
+        fields.add( sparqlEndpoint );
 
         return fields;
     }
