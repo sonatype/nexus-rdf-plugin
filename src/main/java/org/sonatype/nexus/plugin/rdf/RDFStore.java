@@ -18,8 +18,10 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
+import org.sonatype.nexus.plugin.rdf.internal.JenaTDBRepositoryFactory;
 import org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFConfiguration;
 import org.sonatype.sisu.rdf.RepositoryHub;
+import org.sonatype.sisu.rdf.RepositoryHub.RepositoryFactory;
 import org.sonatype.sisu.rdf.StatementsProducer;
 import org.sonatype.sisu.rdf.maven.MavenToRDF;
 import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
@@ -41,10 +43,14 @@ public class RDFStore
 
     private final MavenToRDF mavenToRDF;
 
+    private final RepositoryFactory repositoryFactory;
+
     @Inject
-    public RDFStore( RepositoryHub repositoryHub, MavenToRDF mavenToRDF, List<StatementsProducer> statementsProducers )
+    public RDFStore( RepositoryHub repositoryHub, JenaTDBRepositoryFactory repositoryFactory, MavenToRDF mavenToRDF,
+                     List<StatementsProducer> statementsProducers )
     {
         this.repositoryHub = repositoryHub;
+        this.repositoryFactory = repositoryFactory;
         this.mavenToRDF = mavenToRDF;
         this.statementsProducers = statementsProducers;
         configurations = new HashMap<String, RDFConfiguration>();
@@ -68,14 +74,24 @@ public class RDFStore
         Repository repository = repositoryHub.repository( repositoryIdentity( matchingConfig.repositoryId() ) );
         try
         {
-            RepositoryConnection conn = repository.getConnection();
-            conn.clear( mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
-            if ( !statements.isEmpty() )
+            RepositoryConnection conn = null;
+            try
             {
-                conn.add( statements, mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
+                conn = repository.getConnection();
+                conn.clear( mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
+                if ( !statements.isEmpty() )
+                {
+                    conn.add( statements, mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
+                }
+                conn.commit();
             }
-            conn.commit();
-            conn.close();
+            finally
+            {
+                if ( conn != null )
+                {
+                    conn.close();
+                }
+            }
         }
         catch ( RepositoryException e )
         {
@@ -116,10 +132,20 @@ public class RDFStore
         Repository repository = repositoryHub.repository( repositoryIdentity( matchingConfig.repositoryId() ) );
         try
         {
-            RepositoryConnection conn = repository.getConnection();
-            conn.clear( mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
-            conn.commit();
-            conn.close();
+            RepositoryConnection conn = null;
+            try
+            {
+                conn = repository.getConnection();
+                conn.clear( mavenToRDF.contextFor( matchingConfig.repositoryId(), path.path() ) );
+                conn.commit();
+            }
+            finally
+            {
+                if ( conn != null )
+                {
+                    conn.close();
+                }
+            }
         }
         catch ( RepositoryException e )
         {

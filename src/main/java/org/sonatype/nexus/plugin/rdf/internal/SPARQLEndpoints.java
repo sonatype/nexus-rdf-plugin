@@ -39,7 +39,7 @@ public class SPARQLEndpoints
     }
 
     @Override
-    protected Repository findRepository( String repositoryId )
+    public Repository findRepository( String repositoryId )
     {
         final SPARQLEndpointConfiguration matchingConfig = configurations.get( repositoryId );
         if ( matchingConfig == null )
