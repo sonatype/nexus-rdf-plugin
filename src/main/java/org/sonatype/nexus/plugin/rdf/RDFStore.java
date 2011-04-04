@@ -18,7 +18,6 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
-import org.sonatype.nexus.plugin.rdf.internal.JenaTDBRepositoryFactory;
 import org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFConfiguration;
 import org.sonatype.sisu.rdf.RepositoryHub;
 import org.sonatype.sisu.rdf.RepositoryHub.RepositoryFactory;
@@ -46,7 +45,9 @@ public class RDFStore
     private final RepositoryFactory repositoryFactory;
 
     @Inject
-    public RDFStore( RepositoryHub repositoryHub, JenaTDBRepositoryFactory repositoryFactory, MavenToRDF mavenToRDF,
+    public RDFStore( RepositoryHub repositoryHub,
+                     @Named( "${nexus.plugin.rdf.repository.factory:-sesame-native}" ) RepositoryFactory repositoryFactory,
+                     MavenToRDF mavenToRDF,
                      List<StatementsProducer> statementsProducers )
     {
         this.repositoryHub = repositoryHub;
@@ -155,7 +156,7 @@ public class RDFStore
 
     public void addConfiguration( final RDFConfiguration configuration )
     {
-        repositoryHub.repository( repositoryIdentity( configuration.repositoryId() ) );
+        repositoryHub.repository( repositoryIdentity( configuration.repositoryId() ), repositoryFactory );
         configurations.put( configuration.repositoryId(), configuration );
     }
 

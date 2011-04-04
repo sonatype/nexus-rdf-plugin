@@ -16,7 +16,7 @@
     <description>Nexus RDF Plugin</description>
 
     <properties>
-        <nexus.version>1.10-SNAPSHOT</nexus.version>
+        <nexus.version>1.9.1-SNAPSHOT</nexus.version>
 
         <sisu.assembler.tags>nexus,nexus-plugins</sisu.assembler.tags>
     </properties>
