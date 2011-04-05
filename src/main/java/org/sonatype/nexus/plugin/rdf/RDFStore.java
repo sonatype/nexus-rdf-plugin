@@ -46,7 +46,7 @@ public class RDFStore
 
     @Inject
     public RDFStore( RepositoryHub repositoryHub,
-                     @Named( "${nexus.plugin.rdf.repository.factory:-sesame-native}" ) RepositoryFactory repositoryFactory,
+                     @Named( "${nexus.plugin.rdf.repository.factory:-jena-tdb}" ) RepositoryFactory repositoryFactory,
                      MavenToRDF mavenToRDF,
                      List<StatementsProducer> statementsProducers )
     {
