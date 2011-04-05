@@ -72,7 +72,7 @@ public class RDFStore
         {
             statements.addAll( producer.parse( path, matchingConfig ) );
         }
-        Repository repository = repositoryHub.add( repositoryIdentity( matchingConfig.repositoryId() ) );
+        Repository repository = repositoryHub.get( repositoryIdentity( matchingConfig.repositoryId() ) );
         try
         {
             RepositoryConnection conn = null;
@@ -130,7 +130,7 @@ public class RDFStore
             return;
         }
         logger.debug( String.format( "About to remove RDF statements for item [%s]", path ) );
-        Repository repository = repositoryHub.add( repositoryIdentity( matchingConfig.repositoryId() ) );
+        Repository repository = repositoryHub.get( repositoryIdentity( matchingConfig.repositoryId() ) );
         try
         {
             RepositoryConnection conn = null;
