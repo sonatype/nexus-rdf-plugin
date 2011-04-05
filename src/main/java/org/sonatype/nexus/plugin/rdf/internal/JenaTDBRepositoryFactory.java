@@ -14,7 +14,7 @@ import org.sonatype.sisu.rdf.RepositoryHub;
 import org.sonatype.sisu.rdf.RepositoryIdentity;
 import org.sonatype.sisu.rdf.sesame.jena.JenaTDBRepository;
 
-@Named( "jena-rdb" )
+@Named( "jena-tdb" )
 @Singleton
 public class JenaTDBRepositoryFactory
     implements RepositoryHub.RepositoryFactory
