@@ -1,7 +1,5 @@
 package org.sonatype.nexus.plugin.rdf.internal;
 
-import static org.sonatype.sisu.rdf.RepositoryIdentity.repositoryIdentity;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,24 +10,21 @@ import javax.inject.Singleton;
 import org.openrdf.repository.Repository;
 import org.sonatype.nexus.plugin.rdf.internal.capabilities.SPARQLEndpointConfiguration;
 import org.sonatype.sisu.rdf.RepositoryHub;
-import org.sonatype.sisu.sparql.endpoint.RequestPathSparqlRepositorySource;
-import org.sonatype.sisu.sparql.endpoint.SparqlRepositorySource;
+import org.sonatype.sisu.rdf.RepositoryIdentity;
+import org.sonatype.sisu.sparql.endpoint.RepositoryHubSparqlRepositorySource;
 
 @Named
 @Singleton
 public class SPARQLEndpoints
-    extends RequestPathSparqlRepositorySource
-    implements SparqlRepositorySource
+    extends RepositoryHubSparqlRepositorySource
 {
 
     private final Map<String, SPARQLEndpointConfiguration> configurations;
 
-    private final RepositoryHub repositoryHub;
-
     @Inject
     public SPARQLEndpoints( RepositoryHub repositoryHub )
     {
-        this.repositoryHub = repositoryHub;
+        super( repositoryHub );
         configurations = new HashMap<String, SPARQLEndpointConfiguration>();
     }
 
@@ -39,14 +34,14 @@ public class SPARQLEndpoints
     }
 
     @Override
-    public Repository findRepository( String repositoryId )
+    public Repository get( RepositoryIdentity id )
     {
-        final SPARQLEndpointConfiguration matchingConfig = configurations.get( repositoryId );
+        final SPARQLEndpointConfiguration matchingConfig = configurations.get( id.stringValue() );
         if ( matchingConfig == null )
         {
             return null;
         }
-        return repositoryHub.repository( repositoryIdentity( matchingConfig.repositoryId() ) );
+        return super.get( id );
     }
 
     public void addConfiguration( final SPARQLEndpointConfiguration configuration )
