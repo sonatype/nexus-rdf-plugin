@@ -18,6 +18,7 @@ import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
+import org.sonatype.nexus.plugin.rdf.internal.JenaTDBRepositoryFactory;
 import org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFConfiguration;
 import org.sonatype.sisu.rdf.RepositoryHub;
 import org.sonatype.sisu.rdf.RepositoryHub.RepositoryFactory;
@@ -46,7 +47,7 @@ public class RDFStore
 
     @Inject
     public RDFStore( RepositoryHub repositoryHub,
-                     @Named( "${nexus.plugin.rdf.repository.factory:-jena-tdb}" ) RepositoryFactory repositoryFactory,
+                     JenaTDBRepositoryFactory repositoryFactory,
                      MavenToRDF mavenToRDF,
                      List<StatementsProducer> statementsProducers )
     {

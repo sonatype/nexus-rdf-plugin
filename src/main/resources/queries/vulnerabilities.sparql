@@ -7,10 +7,10 @@ SELECT DISTINCT ?projectVersion ?dependencyProjectVersion ?vulnerability
 
 WHERE {
     
-    SERVICE <${nexusSPARQLEndpoint}>
+    GRAPH <urn:x-arq:UnionGraph>
     { 
-        ?project rdf:type maven:Project ;
-                 maven:projectVersion ?projectVersion .
+        ?project rdf:type maven:Project .
+        ?project maven:projectVersion ?projectVersion .
         ?projectVersion maven:depends ?dependency .
         ?dependency maven:dependency ?dependencyProjectVersion .
     }

@@ -1,12 +1,13 @@
 package org.sonatype.nexus.plugin.rdf;
 
+import static org.sonatype.sisu.rdf.RepositoryIdentity.repositoryIdentity;
+
 import java.util.Date;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.openrdf.repository.RepositoryException;
 import org.slf4j.Logger;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.FeedRecorder;
@@ -23,7 +24,6 @@ import org.sonatype.sisu.rdf.query.QueryHistoryId;
 import org.sonatype.sisu.rdf.query.QueryResultBindingSet;
 import org.sonatype.sisu.rdf.query.QueryResultDiff;
 import org.sonatype.sisu.rdf.query.helper.QueryFile;
-import org.sonatype.sisu.rdf.sesame.jena.SPARQLFederationRepository;
 
 @Named
 @Singleton
@@ -34,8 +34,6 @@ public class SoftwarePolice
     Logger logger;
 
     private final QueryDiff queryDiff;
-
-    private org.openrdf.repository.Repository federatedRepository;
 
     private final FeedRecorder feedRecorder;
 
@@ -86,11 +84,9 @@ public class SoftwarePolice
         QueryResultDiff diff =
                 queryDiff.diffPrevious(
                     QueryHistoryId.hashOf( "nexus:/vulnerabilities/" + repository.getId() ),
-                    federatedRepository(),
+                    nexusSPARQLEndpoints.get( repositoryIdentity( repository.getId() ) ),
                     queryFile.query(),
                     queryFile.queryLanguage(),
-                    Parameter.parameter( "nexusSPARQLEndpoint",
-                        "http://localhost:8081/nexus/sparql/" + repository.getId() ),
                     Parameter.parameter( "sparqlEndpoint", sparqlEndpoint ) );
         if ( diff != null )
         {
@@ -134,11 +130,9 @@ public class SoftwarePolice
         QueryResultDiff diff =
                 queryDiff.diffPrevious(
                     QueryHistoryId.hashOf( "nexus:/licenseViolations/" + repository.getId() ),
-                    federatedRepository(),
+                    nexusSPARQLEndpoints.get( repositoryIdentity( repository.getId() ) ),
                     queryFile.query(),
                     queryFile.queryLanguage(),
-                    Parameter.parameter( "nexusSPARQLEndpoint",
-                        "http://localhost:8081/nexus/sparql/" + repository.getId() ),
                     Parameter.parameter( "sparqlEndpoint", sparqlEndpoint ) );
         if ( diff != null )
         {
@@ -174,23 +168,6 @@ public class SoftwarePolice
                 projectVersion, license, dependency ), ai );
 
         feedRecorder.addNexusArtifactEvent( nae );
-    }
-
-    private org.openrdf.repository.Repository federatedRepository()
-    {
-        if ( federatedRepository == null )
-        {
-            federatedRepository = new SPARQLFederationRepository();
-            try
-            {
-                federatedRepository.initialize();
-            }
-            catch ( RepositoryException e )
-            {
-                throw new RuntimeException( e );
-            }
-        }
-        return federatedRepository;
     }
 
 }
