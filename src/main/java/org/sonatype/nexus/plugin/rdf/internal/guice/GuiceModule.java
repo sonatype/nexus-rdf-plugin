@@ -10,8 +10,8 @@ import javax.inject.Singleton;
 
 import org.apache.maven.model.resolution.ModelResolver;
 import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.sisu.maven.bridge.internal.RemoteModelResolver;
 import org.sonatype.sisu.maven.bridge.internal.RepositorySystemSessionProvider;
+import org.sonatype.sisu.maven.bridge.resolvers.RemoteModelResolver;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
