@@ -113,6 +113,10 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>xercesMinimal</artifactId>
+          <groupId>nekohtml</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
