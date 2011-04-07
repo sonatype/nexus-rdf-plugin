@@ -89,6 +89,12 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-rdf-sesame-jena</artifactId>
       <version>1.0.0-SNAPSHOT</version>
+      <exclusions>
+      	<exclusion>
+      		<artifactId>xercesImpl</artifactId>
+      		<groupId>xerces</groupId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
