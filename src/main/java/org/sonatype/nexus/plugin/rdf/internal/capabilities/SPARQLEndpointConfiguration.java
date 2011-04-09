@@ -45,7 +45,7 @@ public class SPARQLEndpointConfiguration
             return false;
         return true;
     }
-    
+
     @Override
     public String toString()
     {
@@ -54,7 +54,7 @@ public class SPARQLEndpointConfiguration
 
     private static String repository( final Map<String, String> properties )
     {
-        String repositoryId = properties.get( RDFCapabilityDescriptor.REPO_OR_GROUP_ID );
+        String repositoryId = properties.get( SPARQLEndpointCapabilityDescriptor.REPO_OR_GROUP_ID );
         repositoryId = repositoryId.replaceFirst( "repo_", "" );
         repositoryId = repositoryId.replaceFirst( "group_", "" );
         return repositoryId;
