@@ -1,6 +1,6 @@
 package org.sonatype.nexus.plugin.rdf.internal;
 
-import static org.sonatype.sisu.rdf.Names.LOCAL_STORAGE_DIR;
+import static org.sonatype.sisu.rdf.Names.LOCAL_STORAGE;
 
 import java.io.File;
 
@@ -23,7 +23,7 @@ public class JenaTDBRepositoryFactory
     private final File storageDir;
 
     @Inject
-    public JenaTDBRepositoryFactory( @Named( LOCAL_STORAGE_DIR ) File storageDir )
+    public JenaTDBRepositoryFactory( @Named( LOCAL_STORAGE ) File storageDir )
     {
         this.storageDir = storageDir;
     }

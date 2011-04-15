@@ -1,7 +1,7 @@
 package org.sonatype.nexus.plugin.rdf.internal.guice;
 
 import static org.sonatype.sisu.maven.bridge.Names.LOCAL_REPOSITORY_DIR;
-import static org.sonatype.sisu.rdf.Names.LOCAL_STORAGE_DIR;
+import static org.sonatype.sisu.rdf.Names.LOCAL_STORAGE;
 
 import java.io.File;
 
@@ -25,7 +25,7 @@ public class GuiceModule
 
     public void configure( Binder binder )
     {
-        binder.bind( File.class ).annotatedWith( Names.named( LOCAL_STORAGE_DIR ) ).toProvider(
+        binder.bind( File.class ).annotatedWith( Names.named( LOCAL_STORAGE ) ).toProvider(
             NexusConfigurationStorageDirProvider.class );
         binder.bind( File.class ).annotatedWith( Names.named( LOCAL_REPOSITORY_DIR ) ).toProvider(
             LocalRepositoryProvider.class );
