@@ -1,59 +1,39 @@
 package org.sonatype.nexus.plugin.rdf.internal.capabilities;
 
-import java.util.Arrays;
-import java.util.List;
+import static org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFCapabilityDescriptor.*;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
 @Singleton
-@Named( RDFCapability.ID )
+@Named( TYPE_ID )
 public class RDFCapabilityDescriptor
+    extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
-    public static final String ID = RDFCapability.ID;
+    public static final String TYPE_ID = "rdf";
 
-    public static final String REPO_OR_GROUP_ID = "repoOrGroup";
+    private static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
-    private final FormField repoOrGroup;
-
-    private final FormField remoteRepositories;
-
-    private final FormField projectOwner;
-
-    private final FormField defaultLicense;
+    public static final String REPOSITORY = "repositoryId";
 
     public RDFCapabilityDescriptor()
     {
-        repoOrGroup = new RepoOrGroupComboFormField( REPO_OR_GROUP_ID, FormField.MANDATORY );
-        remoteRepositories = new RemoteRepositoriesFormField();
-        projectOwner = new ProjectOwnerFormField();
-        defaultLicense = new DefaultLicenseFormField();
-    }
-
-    public String id()
-    {
-        return ID;
-    }
-
-    public String name()
-    {
-        return "RDF capability";
-    }
-
-    public List<FormField> formFields()
-    {
-        return Arrays.asList( repoOrGroup, remoteRepositories, projectOwner, defaultLicense );
-    }
-
-    public boolean isExposed()
-    {
-        return true;
+        super(
+            TYPE,
+            "RDF capability",
+            "Indexes Maven artifacts as RDF",
+            new RepoOrGroupComboFormField( REPOSITORY, FormField.MANDATORY ),
+            new RemoteRepositoriesFormField()
+        );
     }
 
 }

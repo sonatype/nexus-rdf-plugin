@@ -1,13 +1,11 @@
 package org.sonatype.nexus.plugin.rdf.internal;
 
 import java.util.List;
-
 import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.plugin.rdf.NexusItemPath;
 import org.sonatype.nexus.plugin.rdf.RDFStore;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -40,7 +38,7 @@ public class RDFReindexTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_REINDEX_ACTION;
+        return "REINDEX";
     }
 
     @Override
@@ -48,8 +46,11 @@ public class RDFReindexTask
     {
         if ( getRepositoryId() != null )
         {
-            return String.format( "Regenerating RDF index for repository [%s] from path [%s] and bellow",
-                getRepositoryId(), getResourceStorePath() );
+            return String.format(
+                "Regenerating RDF index for repository [%s] from path [%s] and bellow",
+                getRepositoryId(),
+                getResourceStorePath()
+            );
         }
         else
         {
@@ -67,21 +68,24 @@ public class RDFReindexTask
             MavenRepository repository =
                 getRepositoryRegistry().getRepositoryWithFacet( repositoryId, MavenRepository.class );
 
-            rdfStore.scanAndIndex(
-                    new NexusItemPath( repository,
-                              Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
-                              getResourceStorePath() ) );
+            rdfStore.scanAndIndex( new NexusItemPath(
+                repository,
+                Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
+                getResourceStorePath() )
+            );
         }
         else
         {
-            List<MavenRepository> repositories =
-                getRepositoryRegistry().getRepositoriesWithFacet( MavenRepository.class );
+            final List<MavenRepository> repositories = getRepositoryRegistry().getRepositoriesWithFacet(
+                MavenRepository.class
+            );
             for ( MavenRepository repository : repositories )
             {
-                rdfStore.scanAndIndex(
-                        new NexusItemPath( repository,
-                                  Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
-                                  getResourceStorePath() ) );
+                rdfStore.scanAndIndex( new NexusItemPath(
+                    repository,
+                    Utils.safeGetRepositoryLocalStorageAsFile( repository, logger ),
+                    getResourceStorePath() )
+                );
             }
         }
 

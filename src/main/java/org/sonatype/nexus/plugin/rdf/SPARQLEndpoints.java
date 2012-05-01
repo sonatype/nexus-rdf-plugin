@@ -1,4 +1,4 @@
-package org.sonatype.nexus.plugin.rdf.internal;
+package org.sonatype.nexus.plugin.rdf;
 
 import java.util.HashMap;
 import java.util.Map;

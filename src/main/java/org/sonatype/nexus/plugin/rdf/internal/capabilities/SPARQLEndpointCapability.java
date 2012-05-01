@@ -1,55 +1,53 @@
 package org.sonatype.nexus.plugin.rdf.internal.capabilities;
 
-import java.util.Map;
+import static org.sonatype.nexus.plugin.rdf.internal.capabilities.SPARQLEndpointCapabilityDescriptor.TYPE_ID;
 
-import org.sonatype.nexus.plugin.rdf.internal.SPARQLEndpoints;
-import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugin.rdf.SPARQLEndpoints;
+import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+
+@Singleton
+@Named( TYPE_ID )
 public class SPARQLEndpointCapability
-    extends AbstractCapability
+    extends CapabilitySupport
 {
-
-    public static final String ID = "sparqlEndpointCapability";
 
     private final SPARQLEndpoints sparqlEndpoints;
 
+    private final Conditions conditions;
+
     private SPARQLEndpointConfiguration configuration;
 
-    public SPARQLEndpointCapability( final String id, final SPARQLEndpoints sparqlEndpoints )
+    @Inject
+    public SPARQLEndpointCapability( final SPARQLEndpoints sparqlEndpoints,
+                                     final Conditions conditions )
     {
-        super( id );
         this.sparqlEndpoints = sparqlEndpoints;
+        this.conditions = conditions;
     }
 
     @Override
-    public void create( final Map<String, String> properties )
+    public void onActivate()
     {
-        load( properties );
-    }
-
-    @Override
-    public void load( final Map<String, String> properties )
-    {
-        configuration = new SPARQLEndpointConfiguration( properties );
+        configuration = new SPARQLEndpointConfiguration( context().properties() );
         sparqlEndpoints.addConfiguration( configuration );
     }
 
     @Override
-    public void update( final Map<String, String> properties )
+    public void onPassivate()
     {
-        final SPARQLEndpointConfiguration newConfiguration =
-            new SPARQLEndpointConfiguration( properties );
-        if ( !configuration.equals( newConfiguration ) )
-        {
-            remove();
-            create( properties );
-        }
+        sparqlEndpoints.removeConfiguration( configuration );
     }
 
     @Override
-    public void remove()
+    public Condition activationCondition()
     {
-        sparqlEndpoints.removeConfiguration( configuration );
+        return conditions.capabilities().passivateCapabilityDuringUpdate( context().id() );
     }
 
 }

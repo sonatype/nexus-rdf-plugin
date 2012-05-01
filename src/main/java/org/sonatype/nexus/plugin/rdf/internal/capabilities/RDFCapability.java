@@ -1,55 +1,53 @@
 package org.sonatype.nexus.plugin.rdf.internal.capabilities;
 
-import java.util.Map;
+import static org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFCapabilityDescriptor.TYPE_ID;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugin.rdf.RDFStore;
-import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
+import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 
+@Singleton
+@Named( TYPE_ID )
 public class RDFCapability
-    extends AbstractCapability
+    extends CapabilitySupport
 {
-
-    public static final String ID = "rdfCapability";
 
     private final RDFStore rdfStore;
 
+    private final Conditions conditions;
+
     private RDFConfiguration configuration;
 
-    public RDFCapability( final String id, final RDFStore rdfStore )
+    @Inject
+    public RDFCapability( final RDFStore rdfStore,
+                          final Conditions conditions )
     {
-        super( id );
         this.rdfStore = rdfStore;
+        this.conditions = conditions;
     }
 
     @Override
-    public void create( final Map<String, String> properties )
+    public void onActivate()
     {
-        load( properties );
-    }
-
-    @Override
-    public void load( final Map<String, String> properties )
-    {
-        configuration = new RDFConfiguration( properties );
+        configuration = new RDFConfiguration( context().properties() );
         rdfStore.addConfiguration( configuration );
     }
 
     @Override
-    public void update( final Map<String, String> properties )
+    public void onPassivate()
     {
-        final RDFConfiguration newConfiguration =
-            new RDFConfiguration( properties );
-        if ( !configuration.equals( newConfiguration ) )
-        {
-            remove();
-            create( properties );
-        }
+        rdfStore.removeConfiguration( configuration );
     }
 
     @Override
-    public void remove()
+    public Condition activationCondition()
     {
-        rdfStore.removeConfiguration( configuration );
+        return conditions.capabilities().passivateCapabilityDuringUpdate( context().id() );
     }
 
 }

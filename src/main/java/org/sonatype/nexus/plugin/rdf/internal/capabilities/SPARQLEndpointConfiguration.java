@@ -54,9 +54,7 @@ public class SPARQLEndpointConfiguration
 
     private static String repository( final Map<String, String> properties )
     {
-        String repositoryId = properties.get( SPARQLEndpointCapabilityDescriptor.REPO_OR_GROUP_ID );
-        repositoryId = repositoryId.replaceFirst( "repo_", "" );
-        repositoryId = repositoryId.replaceFirst( "group_", "" );
+        String repositoryId = properties.get( SPARQLEndpointCapabilityDescriptor.REPOSITORY );
         return repositoryId;
     }
 
