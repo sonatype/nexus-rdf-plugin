@@ -25,7 +25,6 @@ import java.io.IOException;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugin.rdf.internal.capabilities.RemoteRepositoriesFormField;
 import org.sonatype.sisu.rdf.query.QueryResult;
 import org.sonatype.sisu.rdf.query.QueryResultBindingSet;
 import com.google.common.base.Throwables;
@@ -34,11 +33,9 @@ public class IndexingIT
     extends RDFITSupport
 {
 
-    static final String NO_CLASSIFIER = null;
-
     public IndexingIT()
     {
-        super( "rdf-capability" );
+        super( "indexing" );
     }
 
     @Before
@@ -69,13 +66,7 @@ public class IndexingIT
         createRDFCapability();
         createSPARQLEndpointCapability();
 
-        deployNRC().deployUsingPomWithRest(
-            getTestRepositoryId(),
-            resolveTestFile( "artifacts/p1.pom" ),
-            resolveTestFile( "artifacts/p1.pom" ),
-            NO_CLASSIFIER,
-            "pom"
-        );
+        deployPom( "p1" );
 
         final QueryResult queryResult = executeQuery( resolveTestFile( "queries/all-statements.sparql" ) );
         assertThat( "Number of statements", queryResult, Matchers.<QueryResultBindingSet>iterableWithSize( 17 ) );
@@ -93,21 +84,8 @@ public class IndexingIT
         createRDFCapability();
         createSPARQLEndpointCapability();
 
-        deployNRC().deployUsingPomWithRest(
-            getTestRepositoryId(),
-            resolveTestFile( "artifacts/p1.pom" ),
-            resolveTestFile( "artifacts/p1.pom" ),
-            NO_CLASSIFIER,
-            "pom"
-        );
-
-        deployNRC().deployUsingPomWithRest(
-            getTestRepositoryId(),
-            resolveTestFile( "artifacts/p11.pom" ),
-            resolveTestFile( "artifacts/p11.pom" ),
-            NO_CLASSIFIER,
-            "pom"
-        );
+        deployPom( "p1" );
+        deployPom( "p11" );
 
         final QueryResult queryResult = executeQuery( resolveTestFile( "queries/all-statements.sparql" ) );
         assertThat( "Number of statements", queryResult, Matchers.<QueryResultBindingSet>iterableWithSize( 35 ) );
@@ -125,13 +103,7 @@ public class IndexingIT
         createRDFCapability();
         createSPARQLEndpointCapability();
 
-        deployNRC().deployUsingPomWithRest(
-            getTestRepositoryId(),
-            resolveTestFile( "artifacts/p1.pom" ),
-            resolveTestFile( "artifacts/p1.pom" ),
-            NO_CLASSIFIER,
-            "pom"
-        );
+        deployPom( "p1" );
 
         final QueryResult queryResult = executeQuery( resolveTestFile( "queries/all-statements.sparql" ) );
         assertThat( "Number of statements", queryResult, Matchers.<QueryResultBindingSet>iterableWithSize( 18 ) );

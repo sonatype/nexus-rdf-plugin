@@ -23,7 +23,6 @@ import static java.util.Arrays.asList;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -56,6 +55,8 @@ import org.sonatype.sisu.rdf.query.helper.QueryFile;
 public class RDFITSupport
     extends NexusRunningITSupport
 {
+
+    protected static final String NO_CLASSIFIER = null;
 
     @Inject
     @Named( "${NexusITSupport.nexus-rdf-plugin-coordinates}" )
@@ -259,6 +260,16 @@ public class RDFITSupport
         return tasksNRC;
     }
 
-
+    protected void deployPom( final String name )
+        throws IOException
+    {
+        deployNRC().deployUsingPomWithRest(
+            getTestRepositoryId(),
+            resolveTestFile( "artifacts/" + name + ".pom" ),
+            resolveTestFile( "artifacts/" + name + ".pom" ),
+            NO_CLASSIFIER,
+            "pom"
+        );
+    }
 
 }
