@@ -52,6 +52,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-rdf-query</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-launcher</artifactId>
       <version>${nexus.version}</version>

@@ -85,13 +85,14 @@ public class RDFConfiguration
 
     private static String[] remoteRepositoriesIds( final Map<String, String> properties )
     {
+        final String repository = repository( properties );
         final String remotes = properties.get( RemoteRepositoriesFormField.ID );
         if ( StringUtils.isBlank( remotes ) )
         {
-            return null;
+            return new String[]{ repository };
         }
 
-        final String[] remoteRepositories = remotes.split( "," );
+        final String[] remoteRepositories = ( repository + "," + remotes ).split( "," );
         return remoteRepositories;
     }
 

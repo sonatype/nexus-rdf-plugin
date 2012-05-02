@@ -29,7 +29,7 @@ public class NexusModelResolver
 
     @Inject
     public NexusModelResolver( final NexusMavenBridge nexusMavenBridge,
-                               final RepositoryRegistry repositoryRegistry)
+                               final RepositoryRegistry repositoryRegistry )
     {
         this.nexusMavenBridge = nexusMavenBridge;
         this.repositoryRegistry = repositoryRegistry;
@@ -38,8 +38,8 @@ public class NexusModelResolver
     public Model resolve( final File file, final String... repositories )
         throws ModelBuildingException
     {
-        final List<MavenRepository> mavenRepositories = new ArrayList<MavenRepository>(  );
-        if(repositories!=null)
+        final List<MavenRepository> mavenRepositories = new ArrayList<MavenRepository>();
+        if ( repositories != null )
         {
             for ( String repositoryId : repositories )
             {

@@ -18,19 +18,24 @@
  */
 package org.sonatype.nexus.plugins.rdf.its;
 
+import static java.util.Arrays.asList;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.junit.Before;
+import org.openrdf.repository.sparql.SPARQLRepository;
 import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.NexusRunningITSupport;
 import org.sonatype.nexus.integrationtests.NexusRestClient;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.plugin.rdf.internal.capabilities.RDFCapabilityDescriptor;
+import org.sonatype.nexus.plugin.rdf.internal.capabilities.SPARQLEndpointCapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.plugins.capabilities.test.CapabilitiesNexusRestClient;
@@ -39,6 +44,14 @@ import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoriesNexusRestClient;
 import org.sonatype.nexus.test.utils.TasksNexusRestClient;
+import org.sonatype.sisu.rdf.query.QueryResult;
+import org.sonatype.sisu.rdf.query.QueryResultBinding;
+import org.sonatype.sisu.rdf.query.QueryResultBindingSet;
+import org.sonatype.sisu.rdf.query.QueryResultFactory;
+import org.sonatype.sisu.rdf.query.QueryRunner;
+import org.sonatype.sisu.rdf.query.helper.ExtractingQueryResultsProcessor;
+import org.sonatype.sisu.rdf.query.helper.PrintingQueryResultsProcessor;
+import org.sonatype.sisu.rdf.query.helper.QueryFile;
 
 public class RDFITSupport
     extends NexusRunningITSupport
@@ -55,6 +68,12 @@ public class RDFITSupport
     @Inject
     @Named( "${NexusITSupport.nexus-maven-bridge-plugin-coordinates}" )
     private String mavenBridgePluginCoordinates;
+
+    @Inject
+    private QueryRunner queryRunner;
+
+    @Inject
+    private QueryResultFactory queryResultFactory;
 
     private final String testRepositoryId;
 
@@ -123,6 +142,18 @@ public class RDFITSupport
         getCapabilitiesNRC().create( capability );
     }
 
+    protected void createSPARQLEndpointCapability( final CapabilityPropertyResource... properties )
+        throws Exception
+    {
+        final CapabilityPropertyResource[] cprs = new CapabilityPropertyResource[properties.length + 1];
+        cprs[0] = property( SPARQLEndpointCapabilityDescriptor.REPOSITORY, getTestRepositoryId() );
+        System.arraycopy( properties, 0, cprs, 1, properties.length );
+        final CapabilityResource capability = capability(
+            SPARQLEndpointCapabilityDescriptor.TYPE_ID, RDFITSupport.class.getName(), cprs
+        );
+        getCapabilitiesNRC().create( capability );
+    }
+
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String classifier )
         throws IOException
     {
@@ -137,6 +168,48 @@ public class RDFITSupport
             url,
             methodSpecificDirectory( "downloads" ) + "/" + artifact + "-" + version + classifierPart + "." + type
         );
+    }
+
+    protected QueryResult executeQuery( final File file )
+        throws IOException
+    {
+        final URL url = new URL( nexus().getUrl().toExternalForm() + "sparql/" + getTestRepositoryId() );
+        final SPARQLRepository sparqlRepository = new SPARQLRepository( url.toExternalForm() );
+        final QueryFile queryFile = QueryFile.fromFile( file );
+
+        final ExtractingQueryResultsProcessor extractingQueryResultsProcessor =
+            new ExtractingQueryResultsProcessor( queryResultFactory );
+
+        queryRunner.execute(
+            sparqlRepository,
+            queryFile.query(),
+            queryFile.queryLanguage(),
+            new PrintingQueryResultsProcessor()
+        );
+
+        queryRunner.execute(
+            sparqlRepository,
+            queryFile.query(),
+            queryFile.queryLanguage(),
+            extractingQueryResultsProcessor
+        );
+
+        return extractingQueryResultsProcessor.queryResult();
+    }
+
+    protected QueryResultBinding qrb( final String name, final String value )
+    {
+        return queryResultFactory.createQueryResultBinding( name, value );
+    }
+
+    protected QueryResultBindingSet qrbs( final QueryResultBinding... binding )
+    {
+        return queryResultFactory.createQueryResultBindingSet( asList( binding ) );
+    }
+
+    protected QueryResult qr( final QueryResultBindingSet... bindingSets )
+    {
+        return queryResultFactory.createQueryResult( asList( bindingSets ) );
     }
 
     public static CapabilityResource capability( final String type,
@@ -185,5 +258,7 @@ public class RDFITSupport
     {
         return tasksNRC;
     }
+
+
 
 }
