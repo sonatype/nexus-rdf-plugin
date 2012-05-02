@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.sonatype.rdf.test</groupId>
+  <artifactId>p1</artifactId>
+  <version>3</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <rdf.category>foo</rdf.category>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.rdf.test</groupId>
+      <artifactId>c1</artifactId>
+      <version>2</version>
+      <type>pom</type>
+    </dependency>
+  </dependencies>
+
+</project>

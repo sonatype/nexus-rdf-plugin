@@ -1,0 +1,16 @@
+# find all artifacts that have a category "foo"
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX maven: <http://maven.apache.org/artifact#>
+PREFIX property: <http://maven.apache.org/artifact/property#>
+PREFIX license: <http://maven.apache.org/license#>
+
+SELECT DISTINCT ?groupId ?artifactId
+
+WHERE {
+    ?project rdf:type maven:Project.
+	?project maven:artifactId ?artifactId.
+	?project maven:groupId ?groupId.
+	?project maven:projectVersion ?projectVersion.
+	?projectVersion property:category "foo".
+}

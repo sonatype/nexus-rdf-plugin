@@ -1,0 +1,19 @@
+# find all artifacts that have a category "foo"
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX maven: <http://maven.apache.org/artifact#>
+PREFIX property: <http://maven.apache.org/artifact/property#>
+PREFIX license: <http://maven.apache.org/license#>
+
+SELECT ?projectVersion ?dependency
+
+WHERE {
+    ?project rdf:type maven:Project.
+	?project maven:projectVersion ?projectVersion.
+	?projectVersion property:category "foo".
+	?projectVersion maven:depends ?depends.
+    ?depends maven:dependency ?dependency.
+    ?dependency maven:version ?dependencyVersion.
+
+    FILTER( ?dependencyVersion >= "2" && ?dependencyVersion <= "3" ).
+}

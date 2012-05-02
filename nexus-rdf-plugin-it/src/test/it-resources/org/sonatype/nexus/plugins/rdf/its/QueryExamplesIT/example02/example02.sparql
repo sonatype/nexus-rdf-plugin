@@ -1,0 +1,21 @@
+# find all artifacts with groupI "org.sonatype.rdf.test" and artifactId "p2" with a category "foo" and version >= 1 and < 4
+
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX maven: <http://maven.apache.org/artifact#>
+PREFIX property: <http://maven.apache.org/artifact/property#>
+PREFIX license: <http://maven.apache.org/license#>
+
+SELECT DISTINCT ?groupId ?artifactId ?version
+
+WHERE {
+    ?project rdf:type maven:Project.
+	?project maven:artifactId ?artifactId.
+	?project maven:artifactId "p2".
+	?project maven:groupId ?groupId.
+	?project maven:groupId "org.sonatype.rdf.test".
+	?project maven:projectVersion ?projectVersion.
+	?projectVersion property:category "foo".
+	?projectVersion maven:version ?version.
+
+	FILTER( ?version >= "1" && ?version < "4" ).
+}
