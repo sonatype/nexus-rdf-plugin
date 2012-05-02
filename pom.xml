@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
 
+    Copyright (c) 2008-2011 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+
+    This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+    Public License Version 3 as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+    http://www.gnu.org/licenses.
+
+    Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+    Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+    All other trademarks are the property of their respective owners.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
@@ -7,155 +26,130 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>8</version>
+    <version>10</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
-  <artifactId>nexus-rdf-plugin</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <packaging>nexus-plugin</packaging>
+  <groupId>org.sonatype.nexus.plugins.rdf</groupId>
+  <artifactId>nexus-rdf-plugin-parent</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-  <name>Nexus : Plugins : RDF</name>
-  <description>Nexus RDF Plugin</description>
-
-  <properties>
-    <nexus.version>2.0.4</nexus.version>
-    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
-  </properties>
+  <name>Nexus : Plugins : RDF : Aggregator</name>
 
   <scm>
     <connection>scm:git:git@github.com/sonatype/nexus-rdf-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/nexus-rdf-plugin.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-rdf-plugin.git</developerConnection>
     <url>http://github.com/sonatype/nexus-rdf-plugin</url>
   </scm>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-bean</artifactId>
-      <version>2.3.0</version>
-      <scope>provided</scope>
-    </dependency>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-web-utils</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
-    </dependency>
+    <nexus.version>2.0.4</nexus.version>
+    <nexus-capabilities-plugin.version>2.0.2</nexus-capabilities-plugin.version>
+    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
+  </properties>
 
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-rdf</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-rdf-sesame-jena</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-sparql-endpoint</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-resource-scanner</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-servlet</artifactId>
-      <version>3.0.0</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.inject</groupId>
-          <artifactId>guice</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.openrdf.alibaba</groupId>
-      <artifactId>alibaba-repository-sparql</artifactId>
-      <version>2.0-beta4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-plugin</artifactId>
-      <type>${nexus.plugin.type}</type>
-      <version>2.0.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-maven-bridge-plugin</artifactId>
-      <version>2.0</version>
-      <type>${nexus.plugin.type}</type>
-      <scope>provided</scope>
-    </dependency>
-
-  </dependencies>
+  <modules>
+    <module>nexus-rdf-plugin</module>
+    <module>nexus-rdf-plugin-it</module>
+  </modules>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+    </testResources>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.10</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.6</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.6</version>
-          </dependency>
-        </dependencies>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <pluginSiteUrl>http://links.sonatype.com/products/nexus/pro/home</pluginSiteUrl>
-          <componentDependencies>
-            <componentDependency>org.sonatype.sisu:sisu-rdf</componentDependency>
-            <componentDependency>org.sonatype.sisu:sisu-sparql-endpoint</componentDependency>
-          </componentDependencies>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
     </plugins>
   </build>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-rdf-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <type>${nexus.plugin.type}</type>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-capabilities-plugin</artifactId>
+        <version>${nexus-capabilities-plugin.version}</version>
+        <type>${nexus.plugin.type}</type>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-maven-bridge-plugin</artifactId>
+        <version>${nexus.version}</version>
+        <type>${nexus.plugin.type}</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <profiles>
+    <profile>
+      <id>quick</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
     <profile>
       <id>idea</id>
