@@ -127,7 +127,7 @@ public class QueryExamplesIT
 
         //executeQuery( resolveTestFile( "queries/all-statements.sparql" ) );
         final QueryResult queryResult = executeQuery( resolveTestFile( "example03.sparql" ) );
-        assertThat( "Number of results", queryResult, Matchers.<QueryResultBindingSet>iterableWithSize( 3 ) );
+        assertThat( "Number of results", queryResult, Matchers.<QueryResultBindingSet>iterableWithSize( 4 ) );
     }
 
 }
